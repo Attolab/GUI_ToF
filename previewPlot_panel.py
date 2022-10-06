@@ -143,7 +143,7 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
                             ('removeBackground_doubleSpinBox', np.mean(self.signal_input)),
                             ('FT_window_comboBox', 2),
                             ('FT_zeropadding_comboBox', 1),
-                            ('FT_zeropaddingpower2_spinBox',12),
+                            ('FT_zeropaddingpower2_spinBox',11),
                             ('FT_zeropadding_spinBox', FourierTransform.next_power_of_2(self.n_sample)),
                             ('outputAxisStart_doubleSpinBox', 0),
                             ('outputAxisEnd_doubleSpinBox', np.pi/(self.axis0_input[1]-self.axis0_input[0])),

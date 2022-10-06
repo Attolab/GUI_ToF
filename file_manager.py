@@ -28,8 +28,11 @@ class FileManager:
         self.dataset_list= []
         if not self.format:
             filename,self.format = os.path.splitext(self.filename)
-        self.makeKeyList()
-   
+        try:
+            self.makeKeyList()
+        except:
+            return
+            
     def makeKeyList(self):
         with h5py.File(self.filename, 'r') as file:
             # keys = self.get_dataset_keys(file)
