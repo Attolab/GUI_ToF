@@ -209,6 +209,7 @@ class imageSelectionTableWidget(QTableWidget):
         # self.setContextMenuPolicy(Qt.CustomContextMenu)
         # self.connect(self,SIGNAL("customContextMenuRequested(QPoint)" ), self.tableItemRightClicked)    
         # Method to add an entry to the table
+    
     def addEntry(self,index=0,parameter=0):
         nRow = self.rowCount()        
         self.insertRow(nRow)

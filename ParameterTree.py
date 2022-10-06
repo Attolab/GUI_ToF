@@ -330,3 +330,75 @@ class Viewer1DGroupParameter(pTypes.GroupParameter):
                 child.sigValueChanged.connect(self.valueChanging)        
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)    
+
+
+
+
+
+
+class VMIParameter(pTypes.GroupParameter):
+    valueChanging_signal = Signal(object,object)
+    removedItem_signal = Signal(object)
+
+    def __init__(self, **opts):
+        pTypes.GroupParameter.__init__(self, **opts)
+        title_params =  {
+                    'name': 'title',
+                    'title':'Plot title',
+                    'type': 'str',
+                    'value': 'Viewer 1D'
+        }
+        image_parameters = {
+                    'center_x': {
+                        'title':'X (horizontal)',                                        
+                        'type': 'int',
+                        'value': 1024,
+                        },   
+                    'center_y': {
+                        'title':'Y (vertical)',                                        
+                        'type': 'int',
+                        'value': 1024,
+                        },                                                   
+                    'theta': {
+                        'title':'Angle (rotation)',                                        
+                        'type': 'float',
+                        'value': 0,
+                        },                                                                           
+                        }                                                  
+        display_parameters =  {
+                    'show_axis': {
+                        'title':'Show Axis',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },   
+                    'show_center': {
+                        'title':'Show Center',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },    
+                    'show_range': {
+                        'title':'Show Range',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },                          
+                }                      
+
+        params_image = Parameter.create(name='image_parameters',title='Image parameters', type='group',expanded = False,children = image_parameters)
+        params_display = Parameter.create(name='display_parameters',title='Display parameters', type='group',expanded = False,children = display_parameters)
+    
+
+        self.addChildren(
+            [params_image,params_display])
+
+        self.sigTreeStateChanged.connect(self.valueChanging)
+
+
+
+    def connectSignal(self,childs):
+        for child in childs:
+            if child.childs:
+                self.connectSignal(child)
+            else:
+                child.sigValueChanged.connect(self.valueChanging)        
+    def valueChanging(self,param, value):
+        self.valueChanging_signal.emit(param, value)    

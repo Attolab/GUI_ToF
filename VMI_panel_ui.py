@@ -17,10 +17,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
     QLabel, QLayout, QLineEdit, QPushButton,
-    QSizePolicy, QSpacerItem, QTableWidgetItem, QToolButton,
-    QVBoxLayout, QWidget)
+    QSizePolicy, QTableWidgetItem, QToolButton, QVBoxLayout,
+    QWidget)
 
 from CustomTableWidget import imageSelectionTableWidget
+from pyqtgraph.parametertree import ParameterTree
 from viewer2D_widget import Viewer2DWidget
 
 class Ui_VMI_panel(object):
@@ -39,7 +40,6 @@ class Ui_VMI_panel(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.label = QLabel(VMI_panel)
@@ -75,9 +75,12 @@ class Ui_VMI_panel(object):
 
         self.verticalLayout.addWidget(self.loadFile_button)
 
-        self.verticalSpacer = QSpacerItem(20, 80, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.settings_parameterTree = ParameterTree(VMI_panel)
+        self.settings_parameterTree.setObjectName(u"settings_parameterTree")
+        sizePolicy1.setHeightForWidth(self.settings_parameterTree.sizePolicy().hasHeightForWidth())
+        self.settings_parameterTree.setSizePolicy(sizePolicy1)
 
-        self.verticalLayout.addItem(self.verticalSpacer)
+        self.verticalLayout.addWidget(self.settings_parameterTree)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")

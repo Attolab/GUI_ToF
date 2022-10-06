@@ -18,6 +18,7 @@ import h5py
 import numpy as np
 import pathlib
 from abel.tools import polar
+from ParameterTree import VMIParameter
 
 class VMIPanel(Ui_VMI_panel,QWidget):
     signal_VMI_panel_creation = Signal(object)
@@ -48,6 +49,12 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         #Connect signals
         # self.connectVMISignal()
         self.connectSignal()
+
+        self.viewerGroupParameter = VMIParameter(name="VMI_settings",title="VMI settings", tip='',
+                     children=[],expanded = False)
+        # self.viewerGroupParameter.valueChanging_signal.connect(self.updatePlotWidget)
+
+        self.settings_parameterTree.setParameters(self.viewerGroupParameter)        
 
     def connectSignal(self):
         # self.image_tableWidget.itemDoubleClicked.connect(self.changeItemSelection)
@@ -84,7 +91,11 @@ class VMIPanel(Ui_VMI_panel,QWidget):
             self.fileManager = FM(self.path)
             positions = self.fileManager.ExtractMetaData_h5()
             indexes = np.arange(len(positions))            
+            # Disconnect signal
             self.image_tableWidget.itemSelectionChanged.disconnect()
+            # Remove previous rows
+            [self.image_tableWidget.removeRow(row) for row in np.flip(np.arange(self.image_tableWidget.rowCount()))]
+            # Add new entries
             [self.image_tableWidget.addEntry(str(index),str(position))for index,position in zip(indexes,positions)]
             self.image_tableWidget.itemSelectionChanged.connect(self.changeItemSelection)
             self.image_tableWidget.setCurrentItem(self.image_tableWidget.selectRow(0))
