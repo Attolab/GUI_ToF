@@ -6,6 +6,7 @@ import scipy.fft as fft
 import scipy.signal.windows as windows
 import scipy.signal as sc_sig
 from scipy.optimize import least_squares, curve_fit
+import matplotlib.pyplot as plt
 
 class FourierTransform:
     
@@ -83,6 +84,7 @@ class FourierTransform:
 
 class Filter:
     # Filter function for starting and ending function
+
     def ApplyFilter(x,y,start=False,end=False,axis = 0):    
         if not(isinstance(start, bool)):
                 mask = x >= start
@@ -105,68 +107,57 @@ class FunctionDictionnary():
 
     class Gauss():
         # Gaussian function
-        def gauss(self,x, a, x0, sigma):
+        def gauss(self, x, a, x0, sigma):
             return a * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
-
         def getNumberOfParameters(self):
             return 3
         def getInitialInput(self):
             return np.array([1,0,1])
-        # Store parameters in parameter vector
-        def store_parameters(n_gaussian, amplitude, mean, sigma):
-            p = np.zeros(shape=(3*n_gaussian,), dtype="float")
-            p[0:n_gaussian] = amplitude
-            p[n_gaussian:2 * n_gaussian] = mean
-            p[2 * n_gaussian:3 * n_gaussian] = sigma
-            return p
 
-
-        # Retrieve parameters from parameter vector
-        def extract_gaussian_parameters(p, n_gaussian):
-            amplitude = p[0:n_gaussian]
-            mean = p[n_gaussian:2 * n_gaussian]
-            sigma = p[2 * n_gaussian:3 * n_gaussian]
-            return amplitude, mean, sigma
-
-
+        # # Store parameters in parameter vector
+        # def store_parameters(n_gaussian, amplitude, mean, sigma):
+        #     p = np.zeros(shape=(3*n_gaussian,), dtype="float")
+        #     p[0:3:n_gaussian] = amplitude
+        #     p[1:3>n_gaussian:2 * n_gaussian] = mean
+        #     p[2 * n_gaussian:3 * n_gaussian] = sigma
+        #     return p
+        # # Retrieve parameters from parameter vector
+        # def extract_gaussian_parameters(p, n_gaussian):
+        #     amplitude = p[0:n_gaussian]
+        #     mean = p[n_gaussian:2 * n_gaussian]
+        #     sigma = p[2 * n_gaussian:3 * n_gaussian]
+        #     return amplitude, mean, sigma
 class PeakFitter():
+
     def __init__(self,x=None,y=None) -> None:
         self.x = x
         self.y = y
 
-    # Return initial guess from peak_finder
-    def make_initial_guess(self,prominence, distance, rel_height, peak_indices =None, results_half=None):
-            peak_indices, results_half = PeakFinder.find_peaks_scipy(self.y, prominence=prominence, distance = distance, rel_height=rel_height)
-            amplitude = self.y[peak_indices]
-            mean = self.x[peak_indices]
-            sigma = (self.x[np.round(results_half[0]).astype(int)]-self.x[0]) / (2 * np.sqrt(2 * np.log(2)))
-            number_of_peaks = len(peak_indices)
-            initial_guess = PeakFitter.store_gaussian_parameters(number_of_peaks, amplitude, mean, sigma)
-            lb = np.concatenate((np.zeros(number_of_peaks), mean - sigma, np.zeros(number_of_peaks)))
-            ub = np.concatenate((np.inf * np.ones_like(amplitude), mean + sigma, np.inf * np.ones_like(amplitude)))
-            return number_of_peaks, initial_guess, lb, ub        
-
     # Launch least_square command
-    def fit(self,function_list=None,initial_input=None,bounds=None):
+    def fit(self,function_list=None,initial_input=None,showOutput = None, **kwargs):
+        self.funcDic = FunctionDictionnary()
         self.function_list = function_list
         self.p = self.buildParameters()
-        if not(initial_input):
+        if not(initial_input.size):
             self.p0 = self.buildInitialInput()
         else:
             self.p0 = initial_input
-        # if not(bounds):
-            # bounds=tuple([lb, ub])
-        parameters_lsq = least_squares(self.getResidual, self.p0, args=() ,max_nfev = 1e3)
-        # parameters_lsq = curve_fit(self.sumFunction, self.p0, self.x, self.y,maxfev = 1e3)
+        self.parameters_lsq = least_squares(self.getResidual, self.p0, args=(), **kwargs)
+        print(f'Success: {self.parameters_lsq.success}?')
+        if showOutput:
+            import matplotlib.pyplot as plt
+            print(f'Cost: {self.parameters_lsq.cost};')
+            print(f'Termination condition: {self.parameters_lsq.status}')
+            print(f'Number of evaluations: {self.parameters_lsq.nfev}')
+            plt.figure()
+            plt.plot(self.x,self.sumFunction(self.parameters_lsq.x))
+            plt.plot(self.x,self.y,linestyle = '--')
+            self.plotFunction(self.parameters_lsq)
+            plt.show()
+        print(f'Output:{self.parameters_lsq.x}')
+        return self.parameters_lsq.x
 
-        print(f'Success:{parameters_lsq.success}?')
-        plt.figure()
-        plt.plot(self.x,parameters_lsq.fun)
-        plt.plot(self.x,self.y,linestyle = '--')
-        plt.show()
-        return parameters_lsq.x
-
-
+    # Sum all functions listed in function_list according to input
     def sumFunction(self,input):
         output = np.zeros_like(self.y)
         last_index=0
@@ -175,7 +166,14 @@ class PeakFitter():
             last_index = current_index + self.p[i]
             output += self.getOutput(f,input[current_index:last_index])
         return output
-
+    # Plot all functions listed in function_list according to input
+    def plotFunction(self,input,):   
+        last_index=0
+        for i,f in enumerate(self.function_list):
+            current_index = last_index
+            last_index = current_index + self.p[i]
+            plt.plot(self.x,self.getOutput(f,input[current_index:last_index]))        
+        plt.show()
     # Calculate residual between expectations and fit
     def getResidual(self,p):     
         err = self.y - self.sumFunction(p)
@@ -183,6 +181,7 @@ class PeakFitter():
 
     def buildParameters(self,):
         return [self.getNumberOfParameters(function) for function in self.function_list]
+
     def buildInitialInput(self,):
         input = np.zeros(np.sum(self.p))
         last_index = 0
@@ -194,13 +193,13 @@ class PeakFitter():
 
     def getOutput(self,f,input):
         if f == 'gaussian':
-            return FunctionDictionnary().Gauss().gauss(self.x,*input)    
+            return self.funcDic.Gauss().gauss(self.x,*input)    
     def  getInitialInput(self,f):
         if f == 'gaussian':
-            return FunctionDictionnary().Gauss().getInitialInput()    
+            return self.funcDic.Gauss().getInitialInput()    
     def getNumberOfParameters(self,f):
         if f == 'gaussian':
-            return FunctionDictionnary().Gauss().getNumberOfParameters()
+            return self.funcDic.Gauss().getNumberOfParameters()
     # def n_gaussian_fit(prominence, distance, rel_height,n=None):
     #     if not(self.x.size):        
     #         x = np.arange(len(y))
@@ -208,31 +207,49 @@ class PeakFitter():
     #     parameters_lsq = least_squares(PeakFitter.res, initial_guess, args=(y, x, number_of_peaks), bounds=tuple([lb, ub]),max_nfev = 1e3)
     #     print(f'Success:{parameters_lsq.success}?')
     #     return parameters_lsq.x, number_of_peaks
+    # Return initial guess from peak_finder
+    # def make_initial_guess(self,prominence, distance, rel_height, peak_indices =None, results_half=None):
+    #         peak_indices, results_half = PeakFinder.find_peaks_scipy(self.y, prominence=prominence, distance = distance, rel_height=rel_height)
+    #         amplitude = self.y[peak_indices]
+    #         mean = self.x[peak_indices]
+    #         sigma = (self.x[np.round(results_half[0]).astype(int)]-self.x[0]) / (2 * np.sqrt(2 * np.log(2)))
+    #         number_of_peaks = len(peak_indices)
+    #         initial_guess = PeakFitter.store_gaussian_parameters(number_of_peaks, amplitude, mean, sigma)
+    #         lb = np.concatenate((np.zeros(number_of_peaks), mean - sigma, np.zeros(number_of_peaks)))
+    #         ub = np.concatenate((np.inf * np.ones_like(amplitude), mean + sigma, np.inf * np.ones_like(amplitude)))
+    #         return number_of_peaks, initial_guess, lb, ub     
 
-
-
-    # # Build full gaussian trace from parameters
-    # def make_gaussian_trace(x, amplitude, mean, sigma):
-    #     number_of_peaks = len(amplitude)
-    #     return np.array(
-    #         [PeakFitter.gauss(x, amplitude[index], mean[index], sigma[index]) for index in np.arange(number_of_peaks)]).sum(axis=0)
-
-
-    # # Calculate residual between expectations and fit
-    # def res(p, y, x, number_of_peaks):
-    #     amplitude, mean, sigma = PeakFitter.extract_gaussian_parameters(p, number_of_peaks)
-    #     y_fit = PeakFitter.make_gaussian_trace(x, amplitude, mean, sigma)
-    #     err = y - y_fit
-    #     return err
 
 class PeakFinder():
+
+    def __init__(self,x=None,y=None) -> None:
+        self.x = x
+        self.y = y
     # Basic peak finder
-    def find_peaks_scipy(y, prominence, distance, rel_height):
-        peak_indices, _ = sc_sig.find_peaks(y, prominence=prominence, distance = distance)
-        results_half = sc_sig.peak_widths(y, peak_indices, rel_height=rel_height)
+    def findPeaksScipy(self,prominence=None, distance=None, rel_height=None):
+        peak_indices,_ = sc_sig.find_peaks(self.y, prominence=prominence, distance = distance)
+        results_half = sc_sig.peak_widths(self.y, peak_indices, rel_height=rel_height) # widths, width_heights, left intersection point, right intersection point        
         return peak_indices, results_half
+        
+    def makeInitialGuess(self,prominence=None, distance=None, rel_height=None,function_type ='gaussian'):
+        peak_indices, results_half = self.findPeaksScipy(prominence,distance,rel_height)
+        amplitude = self.y[peak_indices]
+        mean = self.x[peak_indices]
+        sigma = (self.x[np.round(results_half[0]).astype(int)]-self.x[0]) / (2 * np.sqrt(2 * np.log(2))) # Go from FWHM to STD
+        number_of_peaks = len(peak_indices)
+        if function_type == 'gaussian':
+            initial_guess = np.zeros(3*number_of_peaks)
+            lowerBounds = np.zeros(3*number_of_peaks)
+            upperBounds = np.zeros(3*number_of_peaks)
+            last_index=0
+            for (a, m, s) in zip(amplitude, mean, sigma):
+                current_index = last_index
+                last_index = current_index + 3
+                initial_guess[current_index:last_index] = [a,m,s]
+                lowerBounds[current_index:last_index] = [-np.inf, m - s, 1e-16]
+                upperBounds[current_index:last_index] = [+np.inf, m + s, np.inf]
 
-
+        return number_of_peaks, initial_guess, lowerBounds, upperBounds       
 
 
 if __name__ == "__main__":    
@@ -268,8 +285,9 @@ if __name__ == "__main__":
 
     signal = laserPulse(t,amplitude,t0,FWHM,omega) + laserPulse(t,amplitude,t0+delta_T[0],FWHM,omega)
     signal = gaussianPulse(t,amplitude,t0+delta_T[0],FWHM)+gaussianPulse(t,amplitude,t0+delta_T[-1],FWHM)
-    A = PeakFitter(x=t,y=signal).fit(['gaussian','gaussian'],initial_input=[10,0,1,10,0,1])
-
+    a,b = PeakFinder(x=t,y=signal).findPeaksScipy(distance = 5, rel_height= 0.5, prominence= 0.5)
+    numberOfPeaks,initialGuess, lowerBounds, upperBounds = PeakFinder(x=t,y=signal).makeInitialGuess(distance = 5, rel_height= 0.5, prominence= 0.5)
+    A = PeakFitter(x=t,y=signal).fit(['gaussian','gaussian'],initial_input=initialGuess,ftol = None,bounds = tuple([lowerBounds, upperBounds]))
 
     # # delta_T = np.arange(L)*2*np.pi/10
     # S = np.zeros([delta_T.size,t.size])
