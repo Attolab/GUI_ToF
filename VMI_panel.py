@@ -51,10 +51,50 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.connectSignal()
 
         self.viewerGroupParameter = VMIParameter(name="VMI_settings",title="VMI settings", tip='',
-                     children=[],expanded = False)
-        # self.viewerGroupParameter.valueChanging_signal.connect(self.updatePlotWidget)
+                     children=[],expanded = True)
+        self.viewerGroupParameter.valueChanging_signal.connect(self.updateGUI)
 
-        self.settings_parameterTree.setParameters(self.viewerGroupParameter)        
+        self.settings_parameterTree.setParameters(self.viewerGroupParameter)     
+
+        self.imageViewer.view_2D.addItem(self.x_line_plot)
+        self.imageViewer.view_2D.addItem(self.y_line_plot)
+        self.imageViewer.view_2D.addItem(self.RminDisk_plot)
+        self.imageViewer.view_2D.addItem(self.RmaxDisk_plot)        
+        self.imageViewer.view_2D.addItem(self.center_plot)
+        self.update_axis()
+
+    
+    def updateGUI(self,param,values):
+        for value in values:
+            if value[0] in param.childs[0]: #Image parameters
+                self.updateImagePlot
+                a = 1
+            elif value[0] in param.childs[1]: #Display parameters
+                if param.childs[1]['show_axis']:
+                    self.x_line_plot.show()
+                    self.y_line_plot.show()
+                else:
+                    self.x_line_plot.hide()
+                    self.y_line_plot.hide()                    
+                if param.childs[1]['show_range']:
+                    self.RminDisk_plot.show()    
+                    self.RmaxDisk_plot.show()      
+                else:
+                    self.RminDisk_plot.hide()
+                    self.RmaxDisk_plot.hide()       
+
+                if param.childs[1]['show_center']:
+                    self.center_plot.show()
+                else:
+                    self.center_plot.hide()
+
+        # value[0][0] in param.childs[0]
+        # self.label.show()
+        # self.label.hide()
+        # self.plot.showGrid(x = param.childs[1]['x_grid'], y = param.childs[1]['y_grid'], alpha = param.childs[1]['alpha_grid'])                                                
+        # self.plot.setTitle(title = param['title'])
+        # self.plot.setLabel('bottom', text=param.childs[2]['x_label'])
+        # self.plot.setLabel('left', text=param.childs[3]['y_label'])        
 
     def connectSignal(self):
         # self.image_tableWidget.itemDoubleClicked.connect(self.changeItemSelection)
@@ -318,8 +358,11 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         line_y[0::2] = line_y[0::2] + self.center_x
         line_x[1::2] = line_x[1::2] + self.center_y
         line_y[1::2] = line_y[1::2] + self.center_y
-        self.x_line_plot.setLine(line_x[0],line_x[1],line_x[2],line_x[3])
-        self.y_line_plot.setLine(line_y[0],line_y[1],line_y[2],line_y[3])
+        self.x_line_plot.setLine(*line_x)
+        self.y_line_plot.setLine(*line_y)
+
+        # self.x_line_plot.setLine(line_x[0],line_x[1],line_x[2],line_x[3])
+        # self.y_line_plot.setLine(line_y[0],line_y[1],line_y[2],line_y[3])
     def update_angle(self,theta):
         self.im = rotate(self.im,theta-self.rot_angle, resize=False,center= [self.toolbox.imageCentY_value.value(),self.toolbox.imageCentX_value.value()])                                
         self.rot_angle = theta
