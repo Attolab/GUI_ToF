@@ -118,7 +118,7 @@ class Filter:
             c_x = center[1]
             c_y = center[0]
         x,y = np.ogrid[:shape[0],:shape[1]]
-        mask = np.ones((shape),dtype=Boolean)
+        mask = np.ones((shape),dtype=bool)
         if radial_edges is not None:
             r2 = (x-c_x)*(x-c_x) + (y-c_y)*(y-c_y)   
             mask *= Filter.makeFilter(r2,radial_edges,radial_edges_in)        
