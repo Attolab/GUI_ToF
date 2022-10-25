@@ -240,7 +240,7 @@ class Viewer1DGroupParameter(pTypes.GroupParameter):
 
 
 
-class Viewer1DGroupParameter(pTypes.GroupParameter):
+class Viewer2DGroupParameter(pTypes.GroupParameter):
     valueChanging_signal = Signal(object,object)
 
     def __init__(self, **opts):
@@ -250,27 +250,8 @@ class Viewer1DGroupParameter(pTypes.GroupParameter):
                     'name': 'title',
                     'title':'Plot title',
                     'type': 'str',
-                    'value': 'Viewer 1D'
-        }
-
-        grid_params =  {
-                    'x_grid': {
-                        'title':'x',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },   
-                    'y_grid': {
-                        'title':'y',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },    
-                    'alpha_grid': {
-                        'title':'alpha',                                        
-                        'type': 'slider',
-                        'span': np.linspace(0,1.0,11),
-                        'value': 0.3,
-                        },                            
-                }                      
+                    'value': 'Viewer 2D'
+        }                           
         xAxis_params =  {
                 'x_label': {
                     'title':'label',
@@ -312,10 +293,9 @@ class Viewer1DGroupParameter(pTypes.GroupParameter):
         params_title = Parameter.create(**title_params)
         params_x = Parameter.create(name='x_axis',title='x-axis', type='group',expanded = False,children = xAxis_params)
         params_y = Parameter.create(name='y_axis',title='y-axis', type='group',expanded = False,children = yAxis_params)
-        params_grid = Parameter.create(name='grid',title='Grid', type='group',expanded = False,children = grid_params)
 
         self.addChildren(
-            [params_title,params_grid,params_x,params_y])
+            [params_title,params_x,params_y])
 
         self.sigTreeStateChanged.connect(self.valueChanging)
         # self.connectSignal(self.childs)
@@ -350,12 +330,12 @@ class VMIParameter(pTypes.GroupParameter):
         }
         image_parameters = {
                     'center_x': {
-                        'title':'X (horizontal)',                                        
+                        'title':'X (horizontal/col)',                                        
                         'type': 'int',
                         'value': 1024,
                         },   
                     'center_y': {
-                        'title':'Y (vertical)',                                        
+                        'title':'Y (vertical/row)',                                        
                         'type': 'int',
                         'value': 1024,
                         },                                                   
@@ -363,7 +343,12 @@ class VMIParameter(pTypes.GroupParameter):
                         'title':'Angle (rotation)',                                        
                         'type': 'float',
                         'value': 0,
-                        },                                                                           
+                        },     
+                    'transpose': {
+                        'title':'isTransposed',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },                                                                                                 
                         }                                                  
         display_parameters =  {
                     'show_axis': {
