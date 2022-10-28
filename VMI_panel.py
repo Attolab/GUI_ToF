@@ -49,7 +49,6 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         #Connect signals
         # self.connectVMISignal()
         self.connectSignal()
-
         self.viewerGroupParameter = VMIParameter(name="VMI_settings",title="VMI settings", tip='',
                      children=[],expanded = False)
         # self.viewerGroupParameter.valueChanging_signal.connect(self.updatePlotWidget)
@@ -57,12 +56,22 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.settings_parameterTree.setParameters(self.viewerGroupParameter)        
 
     def connectSignal(self):
-        # self.image_tableWidget.itemDoubleClicked.connect(self.changeItemSelection)
         self.image_tableWidget.itemSelectionChanged.connect(self.changeItemSelection)
         self.loadFile_button.pressed.connect(self.loadFilefromButton)
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.folderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
+        self.VMI_toolBox.sendParameters_signal.connect(self.computeData)
+    def computeData(self,parameters):
+        print(parameters)
+        self.parameterList_VMI_toolbox = parameters
+        self.im_polar
+        for index in np.arange(self.image_tableWidget.rowCount()):
+            data = np.squeeze(self.fileManager.readVMIData_h5(index))   
+            self.calculate_polar(data)
 
+            self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.center_y,self.center_x),Jacobian=True,dr=self.dR,dt=self.dTheta)
+            self.radial_bins = self.rgrid[:,0]
+            self.angular_bins = self.thetagrid[0,:]*180/np.pi            
 
     def press_selectFolder_function(self):       
         self.folderBase_lineEdit.setText(str(QFileDialog.getExistingDirectory(self, 'Choose directory')))
@@ -76,17 +85,11 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         data = np.delete(data,np.arange(0,10),axis=0)
         self.imageViewer.updateViewerWidget(data)
 
-        # self.imageViewer.imageItem.setImage(data,autoRange = self.autoRange_checkBox.isChecked(), autoLevels=self.autoLevels_checkBox.isChecked)
-
-
-
     def loadFilefromButton(self):
         self.path = str(QFileDialog.getOpenFileName(self, 'Import image',self.path_folder)[0])    
         self.loadFile(self.path)
 
-    def loadFile(self,filename=None):
-        # if not filename:
-        #     self.path = str(QFileDialog.getOpenFileName(self, 'Import image','/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-09-21/')[0])    
+    def loadFile(self,):
         if self.path:
             self.fileManager = FM(self.path)
             positions = self.fileManager.ExtractMetaData_h5()
@@ -136,11 +139,13 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.updateCenter_signal.connect(self.toolbox.updateCenter)      
         self.toolbox.abel_inversion_pushbutton.clicked.connect(self.AbelInversion)  
 
-    def calculate_polar(self,recalculate_polar = True):
-        self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.center_x,self.center_y),Jacobian=True,dr=self.dR,dt=self.dTheta)
+    def calculate_polar(self,data):
+        dR = self.parameterList_VMI_toolbox['radialBins_spinBox']
+        dTheta = self.parameterList_VMI_toolbox['angularBins_spinBox']
+        self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = data,origin = (self.center_y,self.center_x),Jacobian=True,dr=dR,dt=dTheta)
         self.radial_bins = self.rgrid[:,0]
         self.angular_bins = self.thetagrid[0,:]*180/np.pi
-        self.update_plot()
+        # self.update_plot()
 
     def update_plot(self):
         self.makeMask()

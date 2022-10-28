@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>560</height>
+    <width>560</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>271</width>
-    <height>297</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_7">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -38,31 +38,217 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0" colspan="2">
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="title">
+         <string>Bins</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="imageBins_label">
+           <property name="text">
+            <string>Image</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="radialBins_label">
+           <property name="text">
+            <string>Radial</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="angularBins_label">
+           <property name="text">
+            <string>Angular</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="imageBins_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="radialBins_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QSpinBox" name="angularBins_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Data filtering</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <layout class="QFormLayout" name="formLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="shapeFilter_label">
+           <property name="text">
+            <string>Selection</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="Range_label">
+           <property name="text">
+            <string>Range</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QFormLayout" name="formLayout_2">
+           <property name="horizontalSpacing">
+            <number>6</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="Rmin_label">
+             <property name="text">
+              <string>Rmin</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="Rmin_doubleSpinBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximum">
+              <double>1000000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="Rmax_label">
+             <property name="text">
+              <string>Rmax</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="Rmax_doubleSpinBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximum">
+              <double>1000000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="shapeFilter_comboBox">
+           <property name="maxCount">
+            <number>10</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Rectangle</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ellipse</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QGroupBox" name="groupBox_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>Data selection and ordering</string>
         </property>
         <layout class="QFormLayout" name="formLayout_3">
          <item row="0" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_12">
+          <widget class="QLabel" name="dataSelection_label">
            <property name="text">
             <string>Selection</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QLineEdit" name="dataSelection_lineEdit"/>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_5">
+          <widget class="QLabel" name="dataSorting_label">
            <property name="text">
             <string>Sort by</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QComboBox" name="abel_inversion_sel_combobox_2">
+          <widget class="QComboBox" name="dataSorting_comboBox">
+           <property name="maxCount">
+            <number>10</number>
+           </property>
            <item>
             <property name="text">
              <string>Image number</string>
@@ -81,14 +267,17 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_6">
+          <widget class="QLabel" name="dataStacking_label">
            <property name="text">
             <string>Stack </string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QComboBox" name="abel_inversion_sel_combobox_3">
+          <widget class="QComboBox" name="dataStacking_comboBox">
+           <property name="maxCount">
+            <number>10</number>
+           </property>
            <item>
             <property name="text">
              <string>No stack</string>
@@ -109,119 +298,6 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="groupBox_3">
-        <property name="title">
-         <string>Data filtering</string>
-        </property>
-        <layout class="QFormLayout" name="formLayout_4">
-         <item row="0" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_13">
-           <property name="text">
-            <string>Selection</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_2"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_14">
-           <property name="text">
-            <string>Range</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <layout class="QFormLayout" name="formLayout_2">
-           <property name="horizontalSpacing">
-            <number>6</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="abel_inversion_sel_label_10">
-             <property name="text">
-              <string>Rmin</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="abel_inversion_sel_label_11">
-             <property name="text">
-              <string>Rmax</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QGroupBox" name="groupBox_5">
-        <property name="title">
-         <string>Bins</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="abel_inversion_sel_label_7">
-           <property name="text">
-            <string>Image</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="abel_inversion_sel_label_8">
-           <property name="text">
-            <string>Radial</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="abel_inversion_sel_label_9">
-           <property name="text">
-            <string>Angular</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QSpinBox" name="spinBox">
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="value">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="spinBox_2">
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="value">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QSpinBox" name="spinBox_3">
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="value">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -230,56 +306,52 @@
      <property name="title">
       <string>Output</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="title">
-           <string>Distributions</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QCheckBox" name="checkBox_3">
-             <property name="text">
-              <string>Radial</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_4">
-             <property name="text">
-              <string>Angular</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_6">
-          <property name="title">
-           <string>Contour</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QCheckBox" name="checkBox_5">
-             <property name="text">
-              <string>Radial</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_6">
-             <property name="text">
-              <string>Angular</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
+         <string>Distributions</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QCheckBox" name="radialDistributions_checkBox">
+           <property name="text">
+            <string>Radial</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="angularDistributions_checkBox">
+           <property name="text">
+            <string>Angular</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="title">
+         <string>Contour</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="angularContour_checkBox">
+           <property name="text">
+            <string>Radial</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="radialContour_checkBox">
+           <property name="text">
+            <string>Angular</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="groupBox">
@@ -295,7 +367,22 @@
           </widget>
          </item>
          <item row="0" column="1" colspan="2">
-          <widget class="QComboBox" name="abel_inversion_sel_combobox">
+          <widget class="QComboBox" name="abelInversion_comboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNone</set>
+           </property>
+           <property name="maxCount">
+            <number>10</number>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+           </property>
            <item>
             <property name="text">
              <string>Abel Davis</string>
@@ -341,7 +428,13 @@
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="QSpinBox" name="spinBox_4">
+          <widget class="QSpinBox" name="abelLegendre_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="maximum">
             <number>1000000000</number>
            </property>
@@ -361,9 +454,12 @@
           </widget>
          </item>
          <item row="2" column="2">
-          <widget class="QCheckBox" name="checkBox_7">
+          <widget class="QCheckBox" name="abelSymmetrize_checkBox">
            <property name="text">
             <string/>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -375,7 +471,17 @@
           </widget>
          </item>
          <item row="3" column="2">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+          <widget class="QDoubleSpinBox" name="abelSmooth_doubleSpinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <double>1000000.000000000000000</double>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -386,21 +492,21 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="go_pushButton">
        <property name="text">
         <string>Try me!</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="showOutput_checkBox">
        <property name="text">
         <string>Show output</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox_2">
+      <widget class="QCheckBox" name="saveOutput_checkBox">
        <property name="text">
         <string>Save output</string>
        </property>

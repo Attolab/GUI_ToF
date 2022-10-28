@@ -15,12 +15,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
-    QLabel, QLayout, QLineEdit, QPushButton,
-    QSizePolicy, QTableWidgetItem, QToolButton, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QHBoxLayout,
+    QHeaderView, QLabel, QLayout, QLineEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QTableWidgetItem,
+    QToolButton, QVBoxLayout, QWidget)
 
 from CustomTableWidget import imageSelectionTableWidget
+from VMI_toolbox import VMIToolBox
 from pyqtgraph.parametertree import ParameterTree
 from viewer2D_widget import Viewer2DWidget
 
@@ -36,8 +37,8 @@ class Ui_VMI_panel(object):
         sizePolicy.setHeightForWidth(VMI_panel.sizePolicy().hasHeightForWidth())
         VMI_panel.setSizePolicy(sizePolicy)
         VMI_panel.setMinimumSize(QSize(0, 0))
-        self.horizontalLayout_3 = QHBoxLayout(VMI_panel)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_6 = QHBoxLayout(VMI_panel)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_5 = QHBoxLayout()
@@ -122,6 +123,8 @@ class Ui_VMI_panel(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.image_tableWidget = imageSelectionTableWidget(VMI_panel)
         if (self.image_tableWidget.columnCount() < 2):
             self.image_tableWidget.setColumnCount(2)
@@ -140,7 +143,30 @@ class Ui_VMI_panel(object):
         self.image_tableWidget.horizontalHeader().setVisible(True)
         self.image_tableWidget.verticalHeader().setVisible(False)
 
-        self.verticalLayout.addWidget(self.image_tableWidget)
+        self.horizontalLayout_3.addWidget(self.image_tableWidget)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+
+        self.dockWidget = QDockWidget(VMI_panel)
+        self.dockWidget.setObjectName(u"dockWidget")
+        self.dockWidget.setFloating(True)
+        self.dockWidgetContents = QWidget()
+        self.dockWidgetContents.setObjectName(u"dockWidgetContents")
+        self.horizontalLayout_4 = QHBoxLayout(self.dockWidgetContents)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.VMI_toolBox = VMIToolBox(self.dockWidgetContents)
+        self.VMI_toolBox.setObjectName(u"VMI_toolBox")
+
+        self.horizontalLayout_4.addWidget(self.VMI_toolBox)
+
+        self.dockWidget.setWidget(self.dockWidgetContents)
+
+        self.verticalLayout.addWidget(self.dockWidget)
 
         self.ApplyButton = QPushButton(VMI_panel)
         self.ApplyButton.setObjectName(u"ApplyButton")
@@ -148,7 +174,7 @@ class Ui_VMI_panel(object):
         self.verticalLayout.addWidget(self.ApplyButton)
 
 
-        self.horizontalLayout_3.addLayout(self.verticalLayout)
+        self.horizontalLayout_6.addLayout(self.verticalLayout)
 
         self.imageViewer = Viewer2DWidget(VMI_panel)
         self.imageViewer.setObjectName(u"imageViewer")
@@ -158,7 +184,7 @@ class Ui_VMI_panel(object):
         sizePolicy5.setHeightForWidth(self.imageViewer.sizePolicy().hasHeightForWidth())
         self.imageViewer.setSizePolicy(sizePolicy5)
 
-        self.horizontalLayout_3.addWidget(self.imageViewer)
+        self.horizontalLayout_6.addWidget(self.imageViewer)
 
 
         self.retranslateUi(VMI_panel)
