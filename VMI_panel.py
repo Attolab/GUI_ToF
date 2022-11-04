@@ -5,7 +5,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform,QPen)
-from PySide6.QtWidgets import (QApplication, QGraphicsEllipseItem,QGraphicsLineItem, QPushButton, QSizePolicy, QToolButton,
+from PySide6.QtWidgets import (QApplication, QGraphicsEllipseItem,QGraphicsLineItem, QPushButton, QSizePolicy, QToolButton,QMessageBox,
     QVBoxLayout, QWidget,QTableWidgetItem,QFileDialog,QDockWidget,QMainWindow)
 from VMI_panel_ui import Ui_VMI_panel
 import pyqtgraph as pg
@@ -19,6 +19,8 @@ import numpy as np
 import pathlib
 from abel.tools import polar
 from ParameterTree import VMIParameter
+import re
+
 
 class VMIPanel(Ui_VMI_panel,QWidget):
     signal_VMI_panel_creation = Signal(object)
@@ -38,7 +40,7 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.rot_angle = 0
         self.dR = 1
         self.dTheta = np.pi/180
-
+        self.nImages = 0
         #Initialize some widgets
         self.initialize_plotWidgets()
         #Open File
@@ -50,8 +52,18 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         # self.connectVMISignal()
         self.connectSignal()
         self.viewerGroupParameter = VMIParameter(name="VMI_settings",title="VMI settings", tip='',
-                     children=[],expanded = True)
+                     children=[],expanded = True)        
         self.viewerGroupParameter.valueChanging_signal.connect(self.updateGUI)
+        # host = Parameter.create(name="Interactive Parameter Use", type="group")
+        # self.interactor = Interactor(parent=self.viewerGroupParameter, runOptions=RunOptions.ON_ACTION)
+        # @self.interactor.decorate()
+        # @printResult
+        # def easySample(a=5, b=6):
+        #     return a + b
+
+        # self.center_x = self.viewerGroupParameter.childs[0]['center_x']
+        # self.center_y = self.viewerGroupParameter.childs[0]['center_y']
+
 
         self.settings_parameterTree.setParameters(self.viewerGroupParameter)     
 
@@ -60,14 +72,21 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.imageViewer.view_2D.addItem(self.RminDisk_plot)
         self.imageViewer.view_2D.addItem(self.RmaxDisk_plot)        
         self.imageViewer.view_2D.addItem(self.center_plot)
-        self.update_axis()
+        self.updateImageViewer()
 
-    
+    def updateImageViewer(self):
+        self.center_x = self.viewerGroupParameter.child('image_parameters').child('center_x').value()
+        self.center_y = self.viewerGroupParameter.child('image_parameters').child('center_y').value()
+        self.rot_angle = self.viewerGroupParameter.child('image_parameters').child('theta').value()     
+        self.update_axis()
+        self.data = self.getData()
+        self.updateImagePlot(self.data)
+
     def updateGUI(self,param,values):
         for value in values:
             if value[0] in param.childs[0]: #Image parameters
-                self.updateImagePlot
-                a = 1
+                self.updateImageViewer()
+                # a = 1
             elif value[0] in param.childs[1]: #Display parameters
                 if param.childs[1]['show_axis']:
                     self.x_line_plot.show()
@@ -86,32 +105,62 @@ class VMIPanel(Ui_VMI_panel,QWidget):
                     self.center_plot.show()
                 else:
                     self.center_plot.hide()
-
-        # value[0][0] in param.childs[0]
-        # self.label.show()
-        # self.label.hide()
-        # self.plot.showGrid(x = param.childs[1]['x_grid'], y = param.childs[1]['y_grid'], alpha = param.childs[1]['alpha_grid'])                                                
-        # self.plot.setTitle(title = param['title'])
-        # self.plot.setLabel('bottom', text=param.childs[2]['x_label'])
-        # self.plot.setLabel('left', text=param.childs[3]['y_label'])        
-
+    
     def connectSignal(self):
         self.image_tableWidget.itemSelectionChanged.connect(self.changeItemSelection)
         self.loadFile_button.pressed.connect(self.loadFilefromButton)
         self.folderBase_lineEdit.editingFinished.connect(self.updateBaseFolder)
         self.folderSelection_toolButton.pressed.connect(self.press_selectFolder_function)
         self.VMI_toolBox.sendParameters_signal.connect(self.computeData)
+
+    
     def computeData(self,parameters):
         print(parameters)
         self.parameterList_VMI_toolbox = parameters
-        self.im_polar
-        for index in np.arange(self.image_tableWidget.rowCount()):
-            data = np.squeeze(self.fileManager.readVMIData_h5(index))   
-            self.calculate_polar(data)
-
-            self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.center_y,self.center_x),Jacobian=True,dr=self.dR,dt=self.dTheta)
-            self.radial_bins = self.rgrid[:,0]
-            self.angular_bins = self.thetagrid[0,:]*180/np.pi            
+        # Separation by a semi-column will relaunch the loop
+        tokens_compute = re.findall('[^;]+',self.parameterList_VMI_toolbox['dataSelection_lineEdit'])
+        for token_c in tokens_compute:
+            tokens_stack = re.findall('[^,]+',token_c)
+            output = []
+            # Loop through inputs separated by comma
+            for token_s in tokens_stack:
+                tokens_stack2 = re.findall('[^:]+',token_s)
+                L = len(tokens_stack2)
+                if L == 1:
+                    if tokens_stack2[0] == 'x':
+                        output_temp = np.arange(0,self.nImages)
+                    else:
+                        output_temp = int(tokens_stack2[0])
+                elif L == 2:
+                    l_t = int(tokens_stack2[0])
+                    if l_t < 0:
+                        l_t = 0                        
+                    u_t = int(tokens_stack2[1])+1
+                    if u_t > self.nImages:
+                        u_t = self.nImages
+                    output_temp = np.arange(l_t,u_t)
+                elif L == 3:
+                    l_t = int(tokens_stack2[0])
+                    if l_t < 0:
+                        l_t = 0                        
+                    u_t = int(tokens_stack2[1])+1
+                    if u_t > self.nImages:
+                        u_t = self.nImages
+                    s_t = int(tokens_stack2[2])
+                    output_temp = np.arange(l_t,u_t,s_t)
+                else:
+                    print('Input not recognized')
+                    output_temp = []
+                output.append(output_temp)
+            if len(output)> 1:
+                output = np.concatenate(output)
+                output = np.sort(output)
+            for index in output:
+                data = np.squeeze(self.fileManager.readVMIData_h5(index))   
+                self.calculate_polar(data)
+                self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.center_y,self.center_x),Jacobian=True,dr=self.dR,dt=self.dTheta)
+                self.radial_bins = self.rgrid[:,0]
+                self.angular_bins = self.thetagrid[0,:]*180/np.pi            
 
     def press_selectFolder_function(self):       
         self.folderBase_lineEdit.setText(str(QFileDialog.getExistingDirectory(self, 'Choose directory')))
@@ -119,15 +168,31 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.path_folder = self.folderBase_lineEdit.text()
     def changeItemSelection(self,):    
         self.loadImagefromIndex(self.image_tableWidget.currentRow())
+    
+    def getData(self,index = 0):
+        if self.path:
+            data = self.loadData(index)
+            data = self.transformData(data)
+            return data
+
+    def loadData(self,index):
+        return np.squeeze(self.fileManager.readVMIData_h5(index))  
+    
+    def transformData(self,data):
+        # Crop
+        data = np.delete(data,np.arange(0,10),axis=0)        
+        # Rotate
+        data = rotate(data,-self.rot_angle, resize=False,center= [self.center_y,self.center_x])                                        
+        return data
 
     def loadImagefromIndex(self,index):  
-        data = np.squeeze(self.fileManager.readVMIData_h5(index))      
-        data = np.delete(data,np.arange(0,10),axis=0)
+        data = self.loadData(index)
+        data = self.transformData(data)
         self.imageViewer.updateViewerWidget(data)
 
     def loadFilefromButton(self):
         self.path = str(QFileDialog.getOpenFileName(self, 'Import image',self.path_folder)[0])    
-        self.loadFile(self.path)
+        self.loadFile()
 
     def loadFile(self,):
         if self.path:
@@ -142,8 +207,9 @@ class VMIPanel(Ui_VMI_panel,QWidget):
             [self.image_tableWidget.addEntry(str(index),str(position))for index,position in zip(indexes,positions)]
             self.image_tableWidget.itemSelectionChanged.connect(self.changeItemSelection)
             self.image_tableWidget.setCurrentItem(self.image_tableWidget.selectRow(0))
-            self.datasetSel_label.setText(self.path)
-            self.imageNumber_value.setText(str(len(positions)))
+            filename = self.path
+            self.nImages= len(positions)
+
 
     def initialize_plotWidgets(self):
         self.radial_dist = pg.PlotDataItem()
@@ -177,7 +243,6 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.imageSel_value.valueChanged.connect(self.updateData)     
         self.image_view.scene.sigMouseMoved.connect(self.mouse_moved)
         self.updateCenter_signal.connect(self.toolbox.updateCenter)      
-        self.toolbox.abel_inversion_pushbutton.clicked.connect(self.AbelInversion)  
 
     def calculate_polar(self,data):
         dR = self.parameterList_VMI_toolbox['radialBins_spinBox']
@@ -185,7 +250,6 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = data,origin = (self.center_y,self.center_x),Jacobian=True,dr=dR,dt=dTheta)
         self.radial_bins = self.rgrid[:,0]
         self.angular_bins = self.thetagrid[0,:]*180/np.pi
-        # self.update_plot()
 
     def update_plot(self):
         self.makeMask()
@@ -311,26 +375,6 @@ class VMIPanel(Ui_VMI_panel,QWidget):
     def close_panel_VMI(self, index):
         self.signal_VMI_panel_destruction.emit(self.panel_index)
         print(f'Close event: VMI panel {self.panel_index} is now closed')  
-##############################################UPDATE COMPONENTS#############################
-
-    def mouse_moved(self, view_pos):
-        try:
-            data = self.im
-            n_rows, n_cols = data.shape
-            scene_pos = self.image_view.getImageItem().mapFromScene(view_pos)
-
-            row, col = int(scene_pos.x()), int(scene_pos.y())  # I inverted x and y
-
-            if (0 <= row < n_rows) and (0 <= col < n_cols):
-                value = data[row, col]
-                self.coords_lb.setText('x = {:d}, y = {:d}\n value = {:}'.format(row, col, value))
-                self.coords_lb.repaint()
-            else:
-                self.coords_lb.setText('')
-            #time.sleep(0.1)        
-        except AttributeError:  # when no image is displayed yet
-            print(traceback.format_exception(*sys.exc_info()))  
-
 
 ##############################################UPDATE COMPONENTS#############################
     def updateData(self, input=0):
@@ -345,8 +389,10 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.radial_dist.setData(x=self.radial_bins[self.mask_radial_bins],y=np.sum(self.im_polar[self.mask_radial_bins,:],axis = 1))
     def updateAngularPlot(self):        
         self.angular_dist.setData(x=self.angular_bins[self.mask_angular_bins],y=np.sum(self.im_polar[:,self.mask_angular_bins], axis=0))
-    def updateImagePlot(self): 
-        self.image.setImage(self.im)  # set image to display, used only for tests
+    def updateImagePlot(self,data):     
+        if data is not None:
+            self.imageViewer.updateViewerWidget(data)
+
     def update_centers(self,Cx,Cy):
         self.center_x = Cx
         self.center_y = Cy               

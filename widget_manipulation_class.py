@@ -55,7 +55,7 @@ class WidgetDataExtraction(object):
             value = widget.currentIndex()
             return (name,value)            
         elif widgetType == 'QLineEdit':
-            value = float(widget.text())
+            value = widget.text()
             return (name,value)
         elif widgetType == 'QSpinBox':
             value = int(widget.value())

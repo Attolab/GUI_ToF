@@ -18,13 +18,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
     QFormLayout, QGridLayout, QGroupBox, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QSizePolicy,
-    QSpinBox, QVBoxLayout, QWidget)
+    QSpinBox, QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_VMI_toolbox_panel(object):
     def setupUi(self, VMI_toolbox_panel):
         if not VMI_toolbox_panel.objectName():
             VMI_toolbox_panel.setObjectName(u"VMI_toolbox_panel")
-        VMI_toolbox_panel.resize(560, 524)
+        VMI_toolbox_panel.resize(531, 575)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -206,7 +206,16 @@ class Ui_VMI_toolbox_panel(object):
         self.groupBox_8.setObjectName(u"groupBox_8")
         self.horizontalLayout = QHBoxLayout(self.groupBox_8)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.groupBox_4 = QGroupBox(self.groupBox_8)
+        self.output_tabWidget = QTabWidget(self.groupBox_8)
+        self.output_tabWidget.setObjectName(u"output_tabWidget")
+        self.output_tabWidget.setTabPosition(QTabWidget.North)
+        self.output_tabWidget.setTabShape(QTabWidget.Rounded)
+        self.output_tabWidget.setMovable(True)
+        self.basic_tab = QWidget()
+        self.basic_tab.setObjectName(u"basic_tab")
+        self.horizontalLayout_2 = QHBoxLayout(self.basic_tab)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.groupBox_4 = QGroupBox(self.basic_tab)
         self.groupBox_4.setObjectName(u"groupBox_4")
         self.verticalLayout = QVBoxLayout(self.groupBox_4)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -221,9 +230,9 @@ class Ui_VMI_toolbox_panel(object):
         self.verticalLayout.addWidget(self.angularDistributions_checkBox)
 
 
-        self.horizontalLayout.addWidget(self.groupBox_4)
+        self.horizontalLayout_2.addWidget(self.groupBox_4)
 
-        self.groupBox_6 = QGroupBox(self.groupBox_8)
+        self.groupBox_6 = QGroupBox(self.basic_tab)
         self.groupBox_6.setObjectName(u"groupBox_6")
         self.verticalLayout_2 = QVBoxLayout(self.groupBox_6)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -238,9 +247,14 @@ class Ui_VMI_toolbox_panel(object):
         self.verticalLayout_2.addWidget(self.radialContour_checkBox)
 
 
-        self.horizontalLayout.addWidget(self.groupBox_6)
+        self.horizontalLayout_2.addWidget(self.groupBox_6)
 
-        self.groupBox = QGroupBox(self.groupBox_8)
+        self.output_tabWidget.addTab(self.basic_tab, "")
+        self.abel_tab = QWidget()
+        self.abel_tab.setObjectName(u"abel_tab")
+        self.horizontalLayout_4 = QHBoxLayout(self.abel_tab)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.groupBox = QGroupBox(self.abel_tab)
         self.groupBox.setObjectName(u"groupBox")
         self.gridLayout_3 = QGridLayout(self.groupBox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
@@ -309,7 +323,80 @@ class Ui_VMI_toolbox_panel(object):
         self.gridLayout_3.addWidget(self.abelSmooth_doubleSpinBox, 3, 2, 1, 1)
 
 
-        self.horizontalLayout.addWidget(self.groupBox)
+        self.horizontalLayout_4.addWidget(self.groupBox)
+
+        self.output_tabWidget.addTab(self.abel_tab, "")
+        self.rabbit_tab = QWidget()
+        self.rabbit_tab.setObjectName(u"rabbit_tab")
+        self.horizontalLayout_5 = QHBoxLayout(self.rabbit_tab)
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.gridLayout_4 = QGridLayout()
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.FT_zeropaddingpower2_spinBox = QSpinBox(self.rabbit_tab)
+        self.FT_zeropaddingpower2_spinBox.setObjectName(u"FT_zeropaddingpower2_spinBox")
+        sizePolicy3 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.FT_zeropaddingpower2_spinBox.sizePolicy().hasHeightForWidth())
+        self.FT_zeropaddingpower2_spinBox.setSizePolicy(sizePolicy3)
+        self.FT_zeropaddingpower2_spinBox.setAutoFillBackground(False)
+        self.FT_zeropaddingpower2_spinBox.setKeyboardTracking(False)
+        self.FT_zeropaddingpower2_spinBox.setMaximum(10000000)
+
+        self.gridLayout_4.addWidget(self.FT_zeropaddingpower2_spinBox, 2, 1, 1, 1)
+
+        self.FT_zeropadding_comboBox = QComboBox(self.rabbit_tab)
+        self.FT_zeropadding_comboBox.addItem("")
+        self.FT_zeropadding_comboBox.addItem("")
+        self.FT_zeropadding_comboBox.addItem("")
+        self.FT_zeropadding_comboBox.addItem("")
+        self.FT_zeropadding_comboBox.setObjectName(u"FT_zeropadding_comboBox")
+        sizePolicy1.setHeightForWidth(self.FT_zeropadding_comboBox.sizePolicy().hasHeightForWidth())
+        self.FT_zeropadding_comboBox.setSizePolicy(sizePolicy1)
+
+        self.gridLayout_4.addWidget(self.FT_zeropadding_comboBox, 1, 1, 1, 1)
+
+        self.FT_zeropadding_spinBox = QSpinBox(self.rabbit_tab)
+        self.FT_zeropadding_spinBox.setObjectName(u"FT_zeropadding_spinBox")
+        sizePolicy3.setHeightForWidth(self.FT_zeropadding_spinBox.sizePolicy().hasHeightForWidth())
+        self.FT_zeropadding_spinBox.setSizePolicy(sizePolicy3)
+        self.FT_zeropadding_spinBox.setKeyboardTracking(False)
+        self.FT_zeropadding_spinBox.setMaximum(10000000)
+
+        self.gridLayout_4.addWidget(self.FT_zeropadding_spinBox, 1, 2, 1, 1)
+
+        self.label_16 = QLabel(self.rabbit_tab)
+        self.label_16.setObjectName(u"label_16")
+        sizePolicy2.setHeightForWidth(self.label_16.sizePolicy().hasHeightForWidth())
+        self.label_16.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_4.addWidget(self.label_16, 1, 0, 1, 1)
+
+        self.label_15 = QLabel(self.rabbit_tab)
+        self.label_15.setObjectName(u"label_15")
+        sizePolicy2.setHeightForWidth(self.label_15.sizePolicy().hasHeightForWidth())
+        self.label_15.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_4.addWidget(self.label_15, 0, 0, 1, 1)
+
+        self.FT_window_comboBox = QComboBox(self.rabbit_tab)
+        self.FT_window_comboBox.addItem("")
+        self.FT_window_comboBox.addItem("")
+        self.FT_window_comboBox.addItem("")
+        self.FT_window_comboBox.addItem("")
+        self.FT_window_comboBox.addItem("")
+        self.FT_window_comboBox.setObjectName(u"FT_window_comboBox")
+        sizePolicy2.setHeightForWidth(self.FT_window_comboBox.sizePolicy().hasHeightForWidth())
+        self.FT_window_comboBox.setSizePolicy(sizePolicy2)
+
+        self.gridLayout_4.addWidget(self.FT_window_comboBox, 0, 1, 1, 2)
+
+
+        self.horizontalLayout_5.addLayout(self.gridLayout_4)
+
+        self.output_tabWidget.addTab(self.rabbit_tab, "")
+
+        self.horizontalLayout.addWidget(self.output_tabWidget)
 
 
         self.verticalLayout_3.addWidget(self.groupBox_8)
@@ -336,6 +423,10 @@ class Ui_VMI_toolbox_panel(object):
 
 
         self.retranslateUi(VMI_toolbox_panel)
+
+        self.output_tabWidget.setCurrentIndex(0)
+        self.FT_window_comboBox.setCurrentIndex(0)
+
 
         QMetaObject.connectSlotsByName(VMI_toolbox_panel)
     # setupUi
@@ -374,6 +465,7 @@ class Ui_VMI_toolbox_panel(object):
         self.groupBox_6.setTitle(QCoreApplication.translate("VMI_toolbox_panel", u"Contour", None))
         self.angularContour_checkBox.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Radial", None))
         self.radialContour_checkBox.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Angular", None))
+        self.output_tabWidget.setTabText(self.output_tabWidget.indexOf(self.basic_tab), QCoreApplication.translate("VMI_toolbox_panel", u"Basic", None))
         self.groupBox.setTitle(QCoreApplication.translate("VMI_toolbox_panel", u"Abel inversion", None))
         self.abel_inversion_sel_label.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Algorithm", None))
         self.abelInversion_comboBox.setItemText(0, QCoreApplication.translate("VMI_toolbox_panel", u"Abel Davis", None))
@@ -388,6 +480,21 @@ class Ui_VMI_toolbox_panel(object):
         self.abel_inversion_sel_label_3.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Symmetrize", None))
         self.abelSymmetrize_checkBox.setText("")
         self.abel_inversion_sel_label_4.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Smooth", None))
+        self.output_tabWidget.setTabText(self.output_tabWidget.indexOf(self.abel_tab), QCoreApplication.translate("VMI_toolbox_panel", u"Abel", None))
+        self.FT_zeropadding_comboBox.setItemText(0, QCoreApplication.translate("VMI_toolbox_panel", u"Next Power of 2 (from input)", None))
+        self.FT_zeropadding_comboBox.setItemText(1, QCoreApplication.translate("VMI_toolbox_panel", u"Power of 2", None))
+        self.FT_zeropadding_comboBox.setItemText(2, QCoreApplication.translate("VMI_toolbox_panel", u"Identical as input", None))
+        self.FT_zeropadding_comboBox.setItemText(3, QCoreApplication.translate("VMI_toolbox_panel", u"Custom", None))
+
+        self.label_16.setText(QCoreApplication.translate("VMI_toolbox_panel", u"0-padding", None))
+        self.label_15.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Window", None))
+        self.FT_window_comboBox.setItemText(0, QCoreApplication.translate("VMI_toolbox_panel", u"Rectangle", None))
+        self.FT_window_comboBox.setItemText(1, QCoreApplication.translate("VMI_toolbox_panel", u"Hann", None))
+        self.FT_window_comboBox.setItemText(2, QCoreApplication.translate("VMI_toolbox_panel", u"Hamming", None))
+        self.FT_window_comboBox.setItemText(3, QCoreApplication.translate("VMI_toolbox_panel", u"Kaiser", None))
+        self.FT_window_comboBox.setItemText(4, QCoreApplication.translate("VMI_toolbox_panel", u"Blackman-Harris", None))
+
+        self.output_tabWidget.setTabText(self.output_tabWidget.indexOf(self.rabbit_tab), QCoreApplication.translate("VMI_toolbox_panel", u"RABBIT", None))
         self.go_pushButton.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Try me!", None))
         self.showOutput_checkBox.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Show output", None))
         self.saveOutput_checkBox.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Save output", None))

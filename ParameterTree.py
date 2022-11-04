@@ -322,11 +322,19 @@ class VMIParameter(pTypes.GroupParameter):
 
     def __init__(self, **opts):
         pTypes.GroupParameter.__init__(self, **opts)
-        title_params =  {
-                    'name': 'title',
-                    'title':'Plot title',
+        file_params =  {
+                    'filename':{
+                    'title':'',
                     'type': 'str',
-                    'value': 'Viewer 1D'
+                    'value': '',
+                    'readOnly':True,
+                    },
+                    'ImageNumber':{
+                    'title': 'Number of images',
+                    'type': 'int',
+                    'value': 0,
+                    'readOnly':True,
+                    },                    
         }
         image_parameters = {
                     'center_x': {
@@ -368,16 +376,21 @@ class VMIParameter(pTypes.GroupParameter):
                         },                          
                 }                      
 
+        params_file = Parameter.create(name='file_parameters',title='File parameters', type='group',expanded = False,children = file_params)
+
         params_image = Parameter.create(name='image_parameters',title='Image parameters', type='group',expanded = False,children = image_parameters)
         params_display = Parameter.create(name='display_parameters',title='Display parameters', type='group',expanded = False,children = display_parameters)
     
 
         self.addChildren(
-            [params_image,params_display])
+            [params_file,params_image,params_display])
 
         self.sigTreeStateChanged.connect(self.valueChanging)
 
-
+    def updateFileParameters(self,params):
+        a=1
+        # self.insertChild()
+        # self.removeChild()
 
     def connectSignal(self,childs):
         for child in childs:

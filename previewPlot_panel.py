@@ -239,6 +239,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
                                                             end=self.parameter_list_signal_toolbox['inputAxis0End_doubleSpinBox'],axis = 1)  
         if self.parameter_list_signal_toolbox['inputAxis0Add_doubleSpinBox'] != 0.:            
             self.axis0_inputPlot += self.parameter_list_signal_toolbox['inputAxis0Add_doubleSpinBox']   
+        if self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit']  is not float:
+            self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit'] = float(self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit'])
         if self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit'] != 1.:
             self.axis0_inputPlot *= self.parameter_list_signal_toolbox['inputAxis0Mult_lineEdit']        
 
@@ -249,6 +251,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
                                                             end=self.parameter_list_signal_toolbox['inputAxis1End_doubleSpinBox'],axis = 0) 
         if self.parameter_list_signal_toolbox['inputAxis1Add_doubleSpinBox'] != 0.:
             self.axis1_inputPlot += self.parameter_list_signal_toolbox['inputAxis1Add_doubleSpinBox']   
+        if self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit']  is not float:
+            self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit'] = float(self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit'])            
         if self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit'] != 1.:
             self.axis1_inputPlot *= self.parameter_list_signal_toolbox['inputAxis1Mult_lineEdit']  
 
@@ -257,6 +261,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         [self.axis0_outputPlot,self.signal_outputPlot] = Filter.ApplyFilter(self.axis0_outputPlot,self.signal_outputPlot,
                                                             start=self.parameter_list_signal_toolbox['outputAxisStart_doubleSpinBox'],
                                                             end=self.parameter_list_signal_toolbox['outputAxisEnd_doubleSpinBox'],axis = 1)                                                                 
+        if self.parameter_list_signal_toolbox['outputAxisMult_lineEdit']  is not float:
+            self.parameter_list_signal_toolbox['outputAxisMult_lineEdit'] = float(self.parameter_list_signal_toolbox['outputAxisMult_lineEdit'])                                                             
         if self.parameter_list_signal_toolbox['outputAxisMult_lineEdit'] != 1.:                                                            
             self.axis0_outputPlot *= self.parameter_list_signal_toolbox['outputAxisMult_lineEdit']    
 

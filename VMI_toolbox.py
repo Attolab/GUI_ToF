@@ -20,6 +20,7 @@ import pathlib
 from abel.tools import polar
 from ParameterTree import VMIParameter
 from widget_manipulation_class import WidgetDataExtraction
+import json
 def value_is_valid(val):
     if isinstance(val, QPixmap):
         return not val.isNull()
@@ -75,20 +76,25 @@ class VMIToolBox(Ui_VMI_toolbox_panel,QWidget):
         #Load UI
         self.setupUi(self)
         self.widget_extraction = WidgetDataExtraction(self,self.makeList_QWidget())
-        # self.widget_extraction.extractValues()
+        self.item_list = self.widget_extraction.extractValues()
         # self.widget_extraction.initializeValues(item_list)
         # self.settings = QSettings("gui.ini", QSettings.IniFormat)
-        restore(self.settings)
+        # restore(self.settings)
         # #Initialize parameters
+        
         self.loadOldParameters()
         self.connectSignals()
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        save(self.settings)
+        # save(self.settings)
         super().closeEvent(event)
 
     def loadOldParameters(self):
-        print('Loading previous parameters')
+        print('Loading old parameters')
+        try:
+            self.widget_extraction.initializeValues(json.load(open("VMIToolbox_settings.txt")))
+        except Exception as e:
+            print(e)
 
     def connectSignals(self):
         self.go_pushButton.pressed.connect(self.launchCalc)
@@ -104,26 +110,39 @@ class VMIToolBox(Ui_VMI_toolbox_panel,QWidget):
         self.parameters = self.widget_extraction.extractValues()
 
     def saveParameters(self):
+        json.dump(self.widget_extraction.extractValues(), open("VMIToolbox_settings.txt",'w'))
         print('Saving GUI state')
-        # save(self.settings)
 
     def sendParameters(self):        
         print('Sending GUI state')
-        self.sendParameters_signal.emit(self.parameters)
+        self.sendParameters_signal.emit(self.widget_extraction.extractValues())
 
 
       
     def makeList_QWidget(self):                
-        return['dataSelection_lineEdit', 'dataSorting_comboBox', 
-                        'dataStacking_comboBox', 'Rmax_doubleSpinBox',         
-                        'Rmin_doubleSpinBox','shapeFilter_comboBox',
-                        'angularBins_spinBox','imageBins_spinBox',
-                        'radialBins_spinBox','abelInversion_comboBox',
-                        'abelSmooth_doubleSpinBox','abelSymmetrize_checkBox',
-                        'abelLegendre_spinBox','angularDistributions_checkBox',
-                        'radialDistributions_checkBox','angularContour_checkBox',
-                        'radialContour_checkBox','saveOutput_checkBox',
-                        'showOutput_checkBox',                                          
+        return['dataSelection_lineEdit',
+                'dataSorting_comboBox',
+                'dataStacking_comboBox',
+                'Rmax_doubleSpinBox',         
+                'Rmin_doubleSpinBox',
+                'shapeFilter_comboBox',
+                'angularBins_spinBox',
+                'imageBins_spinBox',
+                'radialBins_spinBox',
+                'abelInversion_comboBox',
+                'abelSmooth_doubleSpinBox',
+                'abelSymmetrize_checkBox',
+                'abelLegendre_spinBox',
+                'angularDistributions_checkBox',
+                'radialDistributions_checkBox',
+                'angularContour_checkBox',
+                'radialContour_checkBox',
+                'FT_window_comboBox',
+                'FT_zeropadding_comboBox',
+                'FT_zeropadding_spinBox',
+                'FT_zeropaddingpower2_spinBox',
+                'saveOutput_checkBox',
+                'showOutput_checkBox',                                          
                         ]
 
 
