@@ -35,34 +35,20 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         #Initialize parameters
         self.panel_index = index
         self.path = path
-        self.center_x = 0
-        self.center_y = 0
+        self.centerX = 0
+        self.centerY = 0
         self.rot_angle = 0
         self.dR = 1
         self.dTheta = np.pi/180
         self.nImages = 0
         #Initialize some widgets
         self.initialize_plotWidgets()
-        #Open File
-        # self.loadFile()
-        # self.openFile()
-        #Load File
-        # self.VMI_load_func()
         #Connect signals
         # self.connectVMISignal()
         self.connectSignal()
         self.viewerGroupParameter = VMIParameter(name="VMI_settings",title="VMI settings", tip='',
                      children=[],expanded = True)        
         self.viewerGroupParameter.valueChanging_signal.connect(self.updateGUI)
-        # host = Parameter.create(name="Interactive Parameter Use", type="group")
-        # self.interactor = Interactor(parent=self.viewerGroupParameter, runOptions=RunOptions.ON_ACTION)
-        # @self.interactor.decorate()
-        # @printResult
-        # def easySample(a=5, b=6):
-        #     return a + b
-
-        # self.center_x = self.viewerGroupParameter.childs[0]['center_x']
-        # self.center_y = self.viewerGroupParameter.childs[0]['center_y']
 
 
         self.settings_parameterTree.setParameters(self.viewerGroupParameter)     
@@ -72,14 +58,21 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.imageViewer.view_2D.addItem(self.RminDisk_plot)
         self.imageViewer.view_2D.addItem(self.RmaxDisk_plot)        
         self.imageViewer.view_2D.addItem(self.center_plot)
+       
         self.updateImageViewer()
 
+
     def updateImageViewer(self):
-        self.center_x = self.viewerGroupParameter.child('image_parameters').child('center_x').value()
-        self.center_y = self.viewerGroupParameter.child('image_parameters').child('center_y').value()
+        self.centerX = self.viewerGroupParameter.child('image_parameters').child('centerX').value()
+        self.centerY = self.viewerGroupParameter.child('image_parameters').child('centerY').value()
         self.rot_angle = self.viewerGroupParameter.child('image_parameters').child('theta').value()     
-        self.update_axis()
+        self.cropX = self.viewerGroupParameter.child('image_parameters').child('cropX').value()
+        self.cropY = self.viewerGroupParameter.child('image_parameters').child('cropY').value()
+        self.isTransposed = self.viewerGroupParameter.child('image_parameters').child('transpose').value()
+        self.Rmax = self.viewerGroupParameter.child('image_parameters').child('Rmax').value()
         self.data = self.getData()
+        self.updateAxis()
+        self.updateWidgets()
         self.updateImagePlot(self.data)
 
     def updateGUI(self,param,values):
@@ -156,11 +149,14 @@ class VMIPanel(Ui_VMI_panel,QWidget):
                 output = np.concatenate(output)
                 output = np.sort(output)
             for index in output:
-                data = np.squeeze(self.fileManager.readVMIData_h5(index))   
-                self.calculate_polar(data)
-                self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.center_y,self.center_x),Jacobian=True,dr=self.dR,dt=self.dTheta)
-                self.radial_bins = self.rgrid[:,0]
-                self.angular_bins = self.thetagrid[0,:]*180/np.pi            
+                if hasattr(self,'fileManager'):
+                    data = np.squeeze(self.fileManager.readVMIData_h5(index))   
+                    self.calculate_polar(data)
+                    self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = self.im,origin = (self.centerY,self.centerX),Jacobian=True,dr=self.dR,dt=self.dTheta)
+                    self.radial_bins = self.rgrid[:,0]
+                    self.angular_bins = self.thetagrid[0,:]*180/np.pi            
+                else:
+                    print('No file has been loaded')
 
     def press_selectFolder_function(self):       
         self.folderBase_lineEdit.setText(str(QFileDialog.getExistingDirectory(self, 'Choose directory')))
@@ -169,9 +165,14 @@ class VMIPanel(Ui_VMI_panel,QWidget):
     def changeItemSelection(self,):    
         self.loadImagefromIndex(self.image_tableWidget.currentRow())
     
+
+
+#################################### DATA LOADING AND MANIPULATION ###################################
     def getData(self,index = 0):
         if self.path:
             data = self.loadData(index)
+            if self.isTransposed:
+                data = data.T
             data = self.transformData(data)
             return data
 
@@ -180,18 +181,30 @@ class VMIPanel(Ui_VMI_panel,QWidget):
     
     def transformData(self,data):
         # Crop
-        data = np.delete(data,np.arange(0,10),axis=0)        
+        cropX = np.arange(np.abs(self.cropX))
+        cropY = np.arange(np.abs(self.cropY))
+        if self.cropX < 0:
+            cropX = -np.fliplr(cropX)
+        if self.cropY < 0:
+            cropY = -np.fliplr(cropY)            
+        data[:,cropX] = 0
+        data[cropY,:] = 0
         # Rotate
-        data = rotate(data,-self.rot_angle, resize=False,center= [self.center_y,self.center_x])                                        
+        data = rotate(data,-self.rot_angle, resize=False,center= [self.centerY,self.centerX])                                        
         return data
 
     def loadImagefromIndex(self,index):  
-        data = self.loadData(index)
-        data = self.transformData(data)
-        self.imageViewer.updateViewerWidget(data)
+        # data = self.getData(index)
+        self.imageViewer.updateViewerWidget(self.getData(index))
 
     def loadFilefromButton(self):
-        self.path = str(QFileDialog.getOpenFileName(self, 'Import image',self.path_folder)[0])    
+        if hasattr(self,'path_folder'):
+            self.path = str(QFileDialog.getOpenFileName(self, 'Import image',self.path_folder)[0])    
+        else:
+            import os
+            self.path = str(QFileDialog.getOpenFileName(self, 'Import image',)[0])
+            self.path_folder = os.path.dirname(self.path)
+            self.folderBase_lineEdit.setText(self.path_folder)
         self.loadFile()
 
     def loadFile(self,):
@@ -210,12 +223,13 @@ class VMIPanel(Ui_VMI_panel,QWidget):
             filename = self.path
             self.nImages= len(positions)
 
+#################################### PLOT WIDGET ###################################
 
     def initialize_plotWidgets(self):
-        self.radial_dist = pg.PlotDataItem()
-        self.angular_dist = pg.PlotDataItem()
-        self.data_dist = pg.PlotDataItem()
-        self.image = pg.ImageItem()
+        # self.radial_dist = pg.PlotDataItem()
+        # self.angular_dist = pg.PlotDataItem()
+        # self.data_dist = pg.PlotDataItem()
+        # self.image = pg.ImageItem()
         self.center_plot = QGraphicsEllipseItem()  
         self.center_plotradius = 10
         self.center_plot.setPen(pg.mkPen('r', width=3, style=Qt.DashLine))                     
@@ -231,23 +245,10 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.RmaxDisk_plot.setPen(pg.mkPen('y', width=3, style=Qt.DashLine))   
 
 
-    def connectVMISignal(self):
-        self.toolbox.changingAngle_signal.connect(self.update_angle)
-        self.toolbox.changingCenter_signal.connect(self.update_centers)
-        self.toolbox.changingRange_signal.connect(self.update_range)
-        self.toolbox.showingAxis_signal.connect(self.show_axisLine)
-        self.toolbox.showingCenter_signal.connect(self.show_center)
-        self.toolbox.showingRange_signal.connect(self.show_range)
-        self.toolbox.changingAngularBin_signal.connect(self.update_radialbin)
-        self.toolbox.changingRadialBin_signal.connect(self.update_angularbin)
-        self.imageSel_value.valueChanged.connect(self.updateData)     
-        self.image_view.scene.sigMouseMoved.connect(self.mouse_moved)
-        self.updateCenter_signal.connect(self.toolbox.updateCenter)      
-
     def calculate_polar(self,data):
         dR = self.parameterList_VMI_toolbox['radialBins_spinBox']
         dTheta = self.parameterList_VMI_toolbox['angularBins_spinBox']
-        self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = data,origin = (self.center_y,self.center_x),Jacobian=True,dr=dR,dt=dTheta)
+        self.im_polar,self.rgrid,self.thetagrid = polar.reproject_image_into_polar(data = data,origin = (self.centerY,self.centerX),Jacobian=True,dr=dR,dt=dTheta)
         self.radial_bins = self.rgrid[:,0]
         self.angular_bins = self.thetagrid[0,:]*180/np.pi
 
@@ -267,26 +268,6 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.toolbox.imageCentY_value.setValue(Cy)        
         self.update_centers(Cx,Cy)
 
-    # def AbelInversion(self):
-    #     self.N = 5
-    #     self.abel_obj = Abel_object(self.im, self.center_y, self.center_x, self.dTheta, self.dR, self.N, self.Rmax)  
-    #     self.abel_obj.precalculate()
-    #     self.abel_obj.invert()
-    #     self.im_inverted = self.abel_obj.make_inverse_image(self.Rmax,self.N,0)
-    #     if not(self.abel_plot_dock):
-    #         self.abel_plot_dock = dockarea.Dock("Abel inverted image", size=(600, 600))
-    #         self.central_widget.addDock(self.abel_plot_dock, 'right', self.control_dock)     
-    #         self.image_inverted = pg.ImageItem()        
-    #         self.image_inverted.setImage(self.im_inverted)  # set image to display, used only for tests
-    #         self.image_inverted_view = pg.ImageView(imageItem=self.image_inverted, view=pg.PlotItem())     
-    #         self.abel_plot_dock.addWidget(self.image_view)
-    #         self.image_inverted_view.view.invertY(False)
-    #         self.image_inverted_view.setColorMap(self.colormap())                  
-
-    #     self.image_inverted.setImage(self.image_inverted)  # set image to display, used only for tests
-        
-
-
 ##############################################Initialize Widget#############################
     def createDock(self):
         self.radial_plot_dock = dockarea.Dock("Radial distribution", size=(600, 600))
@@ -297,130 +278,53 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.central_widget.addDock(self.angular_plot_dock, 'above', self.radial_plot_dock)                       
         self.central_widget.addDock(self.direct_image_dock, 'above', self.angular_plot_dock)     
 
-    def openFile(self): 
-        self.createDock()                      
-        if self.path is None:
-            self.path = str(QFileDialog.getOpenFileName(self, 'Import image','Q:\LIDyL\Atto\ATTOLAB\SE1\SlowRABBIT')[0])    
-            # self.path = str(QFileDialog.getOpenFileName(self, 'Import image','D:\\Work\\Saclay\\Git\\analysis_GUI_Qt')[0])        
-        self.path_object = pathlib.Path(self.path)             
-        try:
-            h5file = True
-            if h5file:
-                self.scan = '000'  # vérifier dans hdfview
-                self.path2 = ''.join(['Scan',self.scan,'/Detector000/Data2D/Ch000/Data'])
-                with h5py.File(self.path, 'r') as file:                          
-                    self.raw_datas = file['Raw_datas']   
-                    self.image_number = self.raw_datas[self.path2].shape[0]  
-                    self.toolbox.imageCentX_value.setMaximum(self.raw_datas[self.path2].shape[1])
-                    self.toolbox.imageCentY_value.setMaximum(self.raw_datas[self.path2].shape[2])
-                    self.im = np.asarray(self.raw_datas[self.path2][0]).T
-        except Exception:
-            print(traceback.format_exception(*sys.exc_info()))   
-        self.meanCenter()                            
-        self.signal_VMI_panel_creation.emit(['VMI',self.path])
-
-    def readFile(self, index=0):
-        try:
-            with h5py.File(self.path, 'r') as file:                          
-                self.raw_datas = file['Raw_datas']     
-                self.im = np.asarray(self.raw_datas[self.path2][index]).T                
-        except Exception:
-            print(traceback.format_exception(*sys.exc_info())) 
-
-        self.im = rotate(self.im,self.toolbox.imageRot_value.value(), resize=False,center= [self.toolbox.imageCentY_value.value(),self.toolbox.imageCentX_value.value()])                                
-        self.calculate_polar()    
-    def VMI_load_func(self):
-        self.image_index = 0
-        self.readFile()
-        #LABELS + LINE EDITS
-        self.imageSel_value.setSuffix('/'+f'{self.image_number}')
-        self.imageSel_value.setMaximum(self.image_number)
-        self.imageSel_value.setValue(self.image_index)
-        self.dataset_value.setText(f'{self.path_object.stem }')                            
-        # self.radial_dist = pg.PlotDataItem()
-        # self.angular_dist = pg.PlotDataItem()
-        # self.data_dist = pg.PlotDataItem()
-        self.radial_dist.setData(x = self.radial_bins, y=np.sum(self.im_polar,axis = 1))
-        self.angular_dist.setData(x = self.angular_bins, y=np.sum(self.im_polar,axis = 0))
-        # self.angular_dist.setData(x = )
-        # self.data_dist.setData(x = )
-        self.radial_item = pg.PlotItem()
-        self.radial_item.addItem(self.radial_dist)
-        self.angular_item = pg.PlotItem()
-        self.angular_item.addItem(self.angular_dist)
-        self.radial_view = pg.PlotWidget(plotItem = self.radial_item)
-        self.angular_view = pg.PlotWidget(plotItem = self.angular_item)
-        self.radial_plot_dock.addWidget(self.radial_view)
-        self.angular_plot_dock.addWidget(self.angular_view)        
-        self.image.setImage(self.im)  # set image to display, used only for tests
-        self.image_view = pg.ImageView(imageItem=self.image, view=pg.PlotItem())        
-        self.image_view.view.invertY(False)
-        self.image_view.setColorMap(self.colormap())    
-        self.image_view.view.addItem(self.center_plot)   
-        self.image_view.view.addItem(self.x_line_plot)   
-        self.image_view.view.addItem(self.y_line_plot)   
-        self.image_view.view.addItem(self.RminDisk_plot)   
-        self.image_view.view.addItem(self.RmaxDisk_plot)   
-        self.direct_image_dock.addWidget(self.image_view)
-        self.updatePlots()
-
-    def colormap(self):
-        # doing a custom colormap (trying to make it close to the Labview one)
-        pos = np.array([0.0, 0.01, 0.2, 0.4, 0.5, 0.8, 0.99, 1.0])
-        color = np.array([[0, 0, 0, 255], [128, 0, 255, 255], [0, 0, 255, 255],
-                        [0, 255, 255, 255], [0, 255, 0, 255],
-                        [255, 255, 0, 255], [255, 0, 0, 255], [255, 255, 255, 255]],
-                        dtype=np.ubyte)
-        return pg.ColorMap(pos, color)  
-    def close_panel_VMI(self, index):
-        self.signal_VMI_panel_destruction.emit(self.panel_index)
-        print(f'Close event: VMI panel {self.panel_index} is now closed')  
-
 ##############################################UPDATE COMPONENTS#############################
-    def updateData(self, input=0):
-        self.image_index = int(input)
-        self.readFile(self.image_index)        
-        self.updatePlots()
-    def updatePlots(self):
-        self.updateRadialPlot()
-        self.updateAngularPlot()
-        self.updateImagePlot()
-    def updateRadialPlot(self):
-        self.radial_dist.setData(x=self.radial_bins[self.mask_radial_bins],y=np.sum(self.im_polar[self.mask_radial_bins,:],axis = 1))
-    def updateAngularPlot(self):        
-        self.angular_dist.setData(x=self.angular_bins[self.mask_angular_bins],y=np.sum(self.im_polar[:,self.mask_angular_bins], axis=0))
+    # def updateData(self, input=0):
+    #     self.image_index = int(input)
+    #     self.readFile(self.image_index)        
+    #     self.updatePlots()
+    # def updatePlots(self):
+    #     self.updateRadialPlot()
+    #     self.updateAngularPlot()
+    #     self.updateImagePlot()
+    # def updateRadialPlot(self):
+    #     self.radial_dist.setData(x=self.radial_bins[self.mask_radial_bins],y=np.sum(self.im_polar[self.mask_radial_bins,:],axis = 1))
+    # def updateAngularPlot(self):        
+    #     self.angular_dist.setData(x=self.angular_bins[self.mask_angular_bins],y=np.sum(self.im_polar[:,self.mask_angular_bins], axis=0))
     def updateImagePlot(self,data):     
         if data is not None:
             self.imageViewer.updateViewerWidget(data)
 
     def update_centers(self,Cx,Cy):
-        self.center_x = Cx
-        self.center_y = Cy               
+        self.centerX = Cx
+        self.centerY = Cy               
         self.Rmin = self.toolbox.Rmin_spinbox.value()
         self.Rmax = self.toolbox.Rmax_spinbox.value()
-        self.center_plot.setRect(self.center_x-self.center_plotradius, self.center_y-self.center_plotradius, 2*self.center_plotradius, 2*self.center_plotradius)                
-        self.update_axis()
+        self.center_plot.setRect(self.centerX-self.center_plotradius, self.centerY-self.center_plotradius, 2*self.center_plotradius, 2*self.center_plotradius)                
+        self.updateAxis()
         self.calculate_polar()
         self.update_range(self.Rmin,self.Rmax)
-    def update_axis(self):
+
+
+    def updateWidgets(self):
+        self.updateAxis()
+        self.RmaxDisk_plot.setRect(self.centerX-self.Rmax, self.centerY-self.Rmax, 2*self.Rmax, 2*self.Rmax)
+        self.center_plot.setRect(self.centerX-self.center_plotradius, self.centerY-self.center_plotradius, 2*self.center_plotradius, 2*self.center_plotradius)                
+    def updateAxis(self):
         line_x = np.array([-1024,0,1024,0])
         line_y = np.array([0,-1024,0,1024])
-        line_x[0::2] = line_x[0::2] + self.center_x
-        line_y[0::2] = line_y[0::2] + self.center_x
-        line_x[1::2] = line_x[1::2] + self.center_y
-        line_y[1::2] = line_y[1::2] + self.center_y
+        line_x[0::2] = line_x[0::2] + self.centerX
+        line_y[0::2] = line_y[0::2] + self.centerX
+        line_x[1::2] = line_x[1::2] + self.centerY
+        line_y[1::2] = line_y[1::2] + self.centerY
         self.x_line_plot.setLine(*line_x)
         self.y_line_plot.setLine(*line_y)
+    def updateRmax(self):                
+        self.RmaxDisk_plot.setRect(self.centerX-Rmax, self.centerY-Rmax, 2*Rmax, 2*Rmax)
 
-        # self.x_line_plot.setLine(line_x[0],line_x[1],line_x[2],line_x[3])
-        # self.y_line_plot.setLine(line_y[0],line_y[1],line_y[2],line_y[3])
-    def update_angle(self,theta):
-        self.im = rotate(self.im,theta-self.rot_angle, resize=False,center= [self.toolbox.imageCentY_value.value(),self.toolbox.imageCentX_value.value()])                                
-        self.rot_angle = theta
-        self.updateImagePlot()
     def update_range(self,R1,R2):                
-        self.RminDisk_plot.setRect(self.center_x-R1, self.center_y-R1, 2*R1, 2*R1)        
-        self.RmaxDisk_plot.setRect(self.center_x-R2, self.center_y-R2, 2*R2, 2*R2)
+        self.RminDisk_plot.setRect(self.centerX-R1, self.centerY-R1, 2*R1, 2*R1)        
+        self.RmaxDisk_plot.setRect(self.centerX-R2, self.centerY-R2, 2*R2, 2*R2)
         self.update_plot()
     def update_angularbin(self,dTheta):
         self.dTheta = dTheta     
@@ -437,7 +341,11 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.x_line_plot.setVisible(status)
         self.y_line_plot.setVisible(status)
         
-      
+
+
+    def makeList_QWidget(self):                
+        return['folderBase_lineEdit',                                        
+                        ]
 
 def main():
 

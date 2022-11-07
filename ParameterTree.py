@@ -337,12 +337,12 @@ class VMIParameter(pTypes.GroupParameter):
                     },                    
         }
         image_parameters = {
-                    'center_x': {
+                    'centerX': {
                         'title':'X (horizontal/col)',                                        
                         'type': 'int',
                         'value': 1024,
                         },   
-                    'center_y': {
+                    'centerY': {
                         'title':'Y (vertical/row)',                                        
                         'type': 'int',
                         'value': 1024,
@@ -355,8 +355,29 @@ class VMIParameter(pTypes.GroupParameter):
                     'transpose': {
                         'title':'isTransposed',                                        
                         'type': 'bool',
-                        'value': True,
-                        },                                                                                                 
+                        'value': False,
+                        },   
+                    'cropX':{
+                        'title':'Crop (X/horizontal)',                                        
+                        'type': 'slider',
+                        'value': 0,
+                        'step': 1,
+                        'limits':[-2048, 2048],
+                        },       
+                    'cropY':{
+                        'title':'Crop (Y/vertical)',                                        
+                        'type': 'slider',
+                        'value': 0,
+                        'step': 1,
+                        'limits':[-2048, 2048],
+                        },   
+                    'Rmax':{
+                        'title':'ROI',                                        
+                        'type': 'slider',
+                        'value': 1024,
+                        'step': 1,
+                        'limits':[0, 2048],
+                        },                                                                                                                                                               
                         }                                                  
         display_parameters =  {
                     'show_axis': {
@@ -376,14 +397,43 @@ class VMIParameter(pTypes.GroupParameter):
                         },                          
                 }                      
 
-        params_file = Parameter.create(name='file_parameters',title='File parameters', type='group',expanded = False,children = file_params)
+        display_parameters =  {
+                    'Axis': {
+                        'title':'Axis',                                        
+                        'type': 'group',
+                        'children':{
+                            'show_axis': {
+                            'title':'Show Axis',                                        
+                            'type': 'bool',
+                            'value': True,
+                            },   
+                        },   
+        },
+                    'show_center': {
+                        'title':'Show Center',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },    
+                    'show_range': {
+                        'title':'Show Range',                                        
+                        'type': 'bool',
+                        'value': True,
+                        },             
+        }
+        pen_param = Parameter.create(name='pen_param',title='Pen parameters', type='pen',expanded = False)
+        show_plot = Parameter.create(name= 'show_axis', title = 'Show',type= 'bool', value= True,expanded = False)
+        show_plot.sigValueChanged.connect(self.valueChanging)
+        pen_param.sigValueChanging.connect(self.valueChanging)     
+        p = Parameter.create(name='Axis', type='group', children=[show_plot,pen_param], removable=False, renamable=False)
 
+        # params_file = Parameter.create(name='file_parameters',title='File parameters', type='group',expanded = False,children = file_params)
+        # params_file = FileParameter(name="file_parameters", title='File parameters', tip='Click to add children',children=[])
         params_image = Parameter.create(name='image_parameters',title='Image parameters', type='group',expanded = False,children = image_parameters)
         params_display = Parameter.create(name='display_parameters',title='Display parameters', type='group',expanded = False,children = display_parameters)
     
 
         self.addChildren(
-            [params_file,params_image,params_display])
+            [params_image,params_display,p])
 
         self.sigTreeStateChanged.connect(self.valueChanging)
 
@@ -400,3 +450,47 @@ class VMIParameter(pTypes.GroupParameter):
                 child.sigValueChanged.connect(self.valueChanging)        
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)    
+
+
+class FileParameter(pTypes.GroupParameter):
+    valueChanging_signal = Signal(object,object)
+    def __init__(self, **opts):
+        opts['type'] = 'group'
+        opts['addText'] = "Add"
+        opts['addList'] = ['file']
+        pTypes.GroupParameter.__init__(self, **opts)
+    def addNew(self, typ):
+        file_params =  {
+                    'filename':{
+                    'title':'Filename',
+                    'type': 'file',
+                    'value': '',
+                    },
+                    'select':{
+                    'title':'Select',
+                    'type': 'bool',
+                    'value': True,
+                    'readOnly':False,
+                    },                    
+                    'select':{
+                    'title':'Select',
+                    'type': 'bool',
+                    'value': True,
+                    'readOnly':False,
+                    },
+                    'ImageNumber':{
+                    'title': 'Number of images',
+                    'type': 'int',
+                    'value': 0,
+                    'readOnly':True,
+                    },                    
+        }        
+        params = Parameter.create(name="File %d" % (len(self.childs)+1), type='group', removable=True, renamable=True, readOnly = False,children =file_params)
+        params.sigTreeStateChanged.connect(self.valueChanging)
+        self.addChildren([params,])
+
+    def updateParameter(self,p,q):
+        a = 0
+
+    def valueChanging(self,param, value):
+        self.valueChanging_signal.emit(param, value)
