@@ -34,6 +34,7 @@ from viewer2D_widget_ui import Ui_Viewer2DWidget
 import numpy as np
 import matplotlib.pyplot as plt
 from viewer1D_widget import Viewer1DWidget
+from ParameterTree import ROIScalableGroup
 
 
 class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
@@ -55,7 +56,9 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.connectSignals()
         self.setupToolButton()
         self.updateGUI()
-
+        # self.ROIGroupParameter = ROIScalableGroup(name='test')
+        # self.plotGroupParameter.sigContextMenu.connect(self.plotGroupParameter.contextMenuEvent)
+        # self.ROI_ParameterTree.setParameters(self.ROIGroupParameter)        
 
     def mouseMoved(self,evt):
         real_mousePoint = self.view_2D.mapSceneToView(evt[0])

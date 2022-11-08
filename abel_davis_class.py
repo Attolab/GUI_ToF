@@ -6,7 +6,7 @@ from scipy.interpolate import interp1d
 import os.path
 import time
 class Abel_object():
-    def __init__(self, data, center_x, center_y, d_alpha_deg, dr, N, Rmax, parent=None):
+    def __init__(self, data, center_y, center_x, d_alpha_deg, dr, N, Rmax, parent=None):
         """
             Creates an object that can Abel invert an image using the DAVIS
             (Direct Algorithm for Velocity-map Imaging) technique described in
@@ -16,11 +16,10 @@ class Abel_object():
             ----------
             data : 2D np.array
                 The data to invert
-            center_x : int
-                x coordinate of the center of the image, corresponds to vertical axis
-                if the data is transposed
             center_y : int
-                y coordinate of the center of the image
+                y coordinate of the center of the image, corresponds to vertical axis / rows
+            center_x : int
+                x coordinate of the center of the image, corresponds to horizontal axis / cols            
             d_alpha_deg : float
                 Angular coordinate spacing (in degrees)
             dr : int
@@ -49,7 +48,7 @@ class Abel_object():
         self.N_R = int(Rmax/dr)
         self.R_vector = np.linspace(dr, Rmax, self.N_R)
         self.data_polar, r_grid, theta_grid = polar.reproject_image_into_polar(
-            data, origin=(center_x, center_y), dr=dr, dt=self.d_alpha, Jacobian=True)
+            data, origin=(center_y, center_x), dr=dr, dt=self.d_alpha, Jacobian=True)
         self.alpha_vector = theta_grid[0,:]
 
         self.M_inv = {}
@@ -61,7 +60,7 @@ class Abel_object():
             print('Incorrect data shape')
             raise ValueError
         self.data_polar, r_grid, theta_grid = polar.reproject_image_into_polar(
-            data, origin=(self.center_x, self.center_y), dr=self.dr, dt=self.d_alpha, Jacobian=True)
+            data, origin=(self.center_y, self.center_x), dr=self.dr, dt=self.d_alpha, Jacobian=True)
 
     def show(self, data):
         plt.figure()
@@ -287,12 +286,44 @@ class Abel_object():
                      for i in range(1, N - (int(k / 2) + 1) + 1)]).sum(axis=0)
                 self.F[k] = np.dot(self.M_inv[k], m2)        
    
+    def reconstruct(self,sel=None):
+            # Reconstruction of the Abel-inverted image
+            Nr = int(self.Rmax/self.dr)
+            Rvect = np.linspace(self.dr, self.Rmax, Nr)
+            Sinv = np.zeros([2048, 2048])
+            X_vect = np.arange(2048)-self.center_x
+            Y_vect = np.arange(2048)-self.center_y
+            
+            nx = len(X_vect)
+            S = np.zeros([nx**2])
+            R = np.sqrt(X_vect**2+Y_vect[:,np.newaxis]**2).flatten()
+            cosTh = np.cos(np.arctan2(X_vect,Y_vect[:,np.newaxis])).flatten()
+            mask = np.logical_and(R>0, R<self.Rmax)
+            cosTh = cosTh[mask]
+            R = R[mask]            
+            if sel is None:
+                L = np.arange(2*self.N+1)
+            elif sel is str:
+                if sel == 'even':
+                    L = L[0::2]
+                elif sel == 'odd':
+                    L = L[1::2]
+            elif sel is list:
+                L = sel[sel<=self.N]
+            for l in L:
+                S[mask] += interp1d(Rvect, self.F[l])(R)*eval_legendre(l, cosTh) 
+            S[mask] = S[mask]/R
+            Sinv = S.reshape([nx,nx])
+
+            plt.figure()
+            plt.imshow(Sinv, origin='lower', cmap='jet')
+            plt.show()
 
 if __name__ == '__main__':
     from file_manager import FileManager as FM
     from usefulclass import Filter
     path = 'Q:\LIDyL\Atto\ATTOLAB\SE1\Data_Experiments\SE1_2021\\2021-02-15\\'
-    path = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2021/2021-02-15/'
+    # path = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2021/2021-02-15/'
     path = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SE1_2022/2022-09-26/'
     filename = 'Slow rabbit With BlueShift at 500kV_1.h5'
     # filename='Ar-He_PE_Vrep1p0_Vext_0p794_MCP700+300_PMCP2p6em5_7p1em6_avg100_WITHfilter_WITHdrilled_WITHSB_2p3W_better.npy'
@@ -302,24 +333,26 @@ if __name__ == '__main__':
     ############# INPUT PARAMETERS ##########################################
     transpose = False
     remove_bkg = False
-    center_x = 1034  # vertical axis if the data is transposed
-    center_y = 1040  # vertical axis if the data is transposed
+    # center_x = 992  # vertical axis if the data is transposed
+    # center_y = 1018  # vertical axis if the data is transposed
+    center_x = 1026  # vertical axis if the data is transposed
+    center_y = 1027  # vertical axis if the data is transposed
     d_alpha_deg = 0.1  # increment in angle alpha (in degrees)
     dr = 1  # increment in radius r
-    N = 3  # number of photons. Determines the number of legendre polynomials to use (which is equal to 2N+1)
+    N = 2  # number of photons. Determines the number of legendre polynomials to use (which is equal to 2N+1)
     # ex: if N=1 then P0, P1 and P2 are used. If N=2 then P0 to P4 are used.
-    Rmax = 1000  # maximum radius up to which the image is inverted
+    Rmax = 500  # maximum radius up to which the image is inverted
     #########################################################################
     Vmax = 5000
     if transpose:
         data = np.transpose(data)
     if remove_bkg:
         data = data - data[0:200,0:200].mean()
-    data *= Filter.PolarFilter(data.shape,(center_x,center_y),radial_edges=(0,1000),)
+    # center_y = 2048 - center_y  # because of the top/bottom coordinate convention
+    data *= Filter.PolarFilter(data.shape,(center_y,center_x),radial_edges=(0,1000),)
 
     plt.figure('Raw image')
     plt.imshow(data,origin ='lower',cmap='jet')
-    center_y = 2048 - center_y  # because of the top/bottom coordinate convention
     abel_obj = Abel_object(data, center_y, center_x, d_alpha_deg, dr, N, Rmax)    
     abel_obj.show(data)
     abel_obj.precalculate()
@@ -343,11 +376,12 @@ if __name__ == '__main__':
     ax.set_ylabel("Intensity (arb. u.)", fontsize=14)
     for i in range(len(abel_obj.F)):
         ax.plot(abel_obj.F[i], label=f'P{i}')
-    plt.legend()
+    plt.legend()    
     plt.show()
-
-    reconstr = True
+    abel_obj.reconstruct()
+    reconstr = False
     if reconstr:
+        abel_obj.reconstruct()
         # Reconstruction of the Abel-inverted image
         Nr = int(Rmax/dr)
         Rvect = np.linspace(dr, Rmax, Nr)
@@ -355,7 +389,6 @@ if __name__ == '__main__':
         X_vect = np.arange(2048)-center_x
         Y_vect = np.arange(2048)-center_y
         
-
         h0 = interp1d(Rvect, abel_obj.F[0])
         h2 = interp1d(Rvect, abel_obj.F[2])
         h4 = interp1d(Rvect, abel_obj.F[4])
@@ -370,17 +403,7 @@ if __name__ == '__main__':
         S[mask] = 1/R*(h0(R) 
                         + h2(R)*eval_legendre(2, cosTh) 
                         + h4(R)*eval_legendre(4, cosTh) 
-                            )
-        # Sinv =np.transpose(S.reshape([L,L]))          
-        # for i in range(L**2):    
-        #     r = R[i]        
-        #     if np.not_equal(r,0) and r < Rmax:
-        #         costh = cosTh[i]
-        #         S[i] = 1/r*(h0(r)
-        #                     + h2(r) * 0.5*(3*costh**2 - 1) 
-        #                     + h4(r) * 1/8*(35*costh**4 - 30*costh**2 + 1)
-        #                         )
-        # Sinv =np.transpose(S.reshape([L,L]))    
+                            ) 
         Sinv = S.reshape([L,L])
 
         plt.figure()

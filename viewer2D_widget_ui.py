@@ -33,8 +33,8 @@ class Ui_Viewer2DWidget(object):
         sizePolicy.setHeightForWidth(Viewer2DWidget.sizePolicy().hasHeightForWidth())
         Viewer2DWidget.setSizePolicy(sizePolicy)
         Viewer2DWidget.setLocale(QLocale(QLocale.C, QLocale.AnyTerritory))
-        self.horizontalLayout_3 = QHBoxLayout(Viewer2DWidget)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_4 = QHBoxLayout(Viewer2DWidget)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
@@ -102,8 +102,10 @@ class Ui_Viewer2DWidget(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
 
-        self.horizontalLayout_3.addLayout(self.verticalLayout_2)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_2)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.makeROI_toolButton = QToolButton(Viewer2DWidget)
@@ -142,6 +144,9 @@ class Ui_Viewer2DWidget(object):
 
 
         self.horizontalLayout_3.addLayout(self.verticalLayout)
+
+
+        self.horizontalLayout_4.addLayout(self.horizontalLayout_3)
 
 
         self.retranslateUi(Viewer2DWidget)

@@ -117,6 +117,8 @@ class VMIToolBox(Ui_VMI_toolbox_panel,QWidget):
         print('Sending GUI state')
         self.sendParameters_signal.emit(self.widget_extraction.extractValues())
 
+    def getParameters(self):
+        return self.widget_extraction.extractValues()
 
       
     def makeList_QWidget(self):                

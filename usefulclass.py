@@ -306,7 +306,7 @@ class PeakFinder():
                 current_index = last_index
                 last_index = current_index + 3
                 initial_guess[current_index:last_index] = [a,m,s]
-                lowerBounds[current_index:last_index] = [1e-16, m - s, 1e-16]
+                lowerBounds[current_index:last_index] = [-np.inf, m - s, 1e-16]
                 upperBounds[current_index:last_index] = [+np.inf, m + s, 1.2*a]
         if showOutput:
             plt.plot(self.x,self.y)

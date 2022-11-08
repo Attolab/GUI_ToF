@@ -379,61 +379,62 @@ class VMIParameter(pTypes.GroupParameter):
                         'limits':[0, 2048],
                         },                                                                                                                                                               
                         }                                                  
-        display_parameters =  {
-                    'show_axis': {
-                        'title':'Show Axis',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },   
-                    'show_center': {
-                        'title':'Show Center',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },    
-                    'show_range': {
-                        'title':'Show Range',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },                          
-                }                      
+        # display_parameters =  {
+        #             'show_axis': {
+        #                 'title':'Show Axis',                                        
+        #                 'type': 'bool',
+        #                 'value': True,
+        #                 },   
+        #             'show_center': {
+        #                 'title':'Show Center',                                        
+        #                 'type': 'bool',
+        #                 'value': True,
+        #                 },    
+        #             'show_range': {
+        #                 'title':'Show Range',                                        
+        #                 'type': 'bool',
+        #                 'value': True,
+        #                 },                          
+        #         }                      
 
-        display_parameters =  {
-                    'Axis': {
-                        'title':'Axis',                                        
-                        'type': 'group',
-                        'children':{
-                            'show_axis': {
-                            'title':'Show Axis',                                        
-                            'type': 'bool',
-                            'value': True,
-                            },   
-                        },   
-        },
-                    'show_center': {
-                        'title':'Show Center',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },    
-                    'show_range': {
-                        'title':'Show Range',                                        
-                        'type': 'bool',
-                        'value': True,
-                        },             
-        }
-        pen_param = Parameter.create(name='pen_param',title='Pen parameters', type='pen',expanded = False)
-        show_plot = Parameter.create(name= 'show_axis', title = 'Show',type= 'bool', value= True,expanded = False)
-        show_plot.sigValueChanged.connect(self.valueChanging)
-        pen_param.sigValueChanging.connect(self.valueChanging)     
-        p = Parameter.create(name='Axis', type='group', children=[show_plot,pen_param], removable=False, renamable=False)
+        # display_parameters =  {
+        #             'Axis': {
+        #                 'title':'Axis',                                        
+        #                 'type': 'group',
+        #                 'children':{
+        #                     'show_axis': {
+        #                     'title':'Show Axis',                                        
+        #                     'type': 'bool',
+        #                     'value': True,
+        #                     },   
+        #                 },   
+        # },
+        #             'show_center': {
+        #                 'title':'Show Center',                                        
+        #                 'type': 'bool',
+        #                 'value': True,
+        #                 },    
+        #             'show_range': {
+        #                 'title':'Show Range',                                        
+        #                 'type': 'bool',
+        #                 'value': True,
+        #                 },             
+        # }
+        # pen_param = Parameter.create(name='pen_param',title='Pen parameters', type='pen',expanded = False)
+        # show_plot = Parameter.create(name= 'show_axis', title = 'Show',type= 'bool', value= True,expanded = False)
+        # show_plot.sigValueChanged.connect(self.valueChanging)
+        # pen_param.sigValueChanging.connect(self.valueChanging)     
+        # p = Parameter.create(name='Axis', type='group', children=[show_plot,pen_param], removable=False, renamable=False)
 
         # params_file = Parameter.create(name='file_parameters',title='File parameters', type='group',expanded = False,children = file_params)
         # params_file = FileParameter(name="file_parameters", title='File parameters', tip='Click to add children',children=[])
         params_image = Parameter.create(name='image_parameters',title='Image parameters', type='group',expanded = False,children = image_parameters)
-        params_display = Parameter.create(name='display_parameters',title='Display parameters', type='group',expanded = False,children = display_parameters)
+        params_display = Parameter.create(name='display_parameters',title='Display parameters', type='group',expanded = False,children = 
+        [PlotParameter(name='axis',title='Axis'),PlotParameter(name='range',title='Range'),PlotParameter(name='center',title='Center')])
     
-
+        
         self.addChildren(
-            [params_image,params_display,p])
+            [params_image,params_display,])
 
         self.sigTreeStateChanged.connect(self.valueChanging)
 
@@ -451,6 +452,23 @@ class VMIParameter(pTypes.GroupParameter):
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)    
 
+class PlotParameter(pTypes.GroupParameter):
+    valueChanging_signal = Signal(object,object)
+
+    def __init__(self, **opts):
+        pTypes.GroupParameter.__init__(self, **opts)
+        pen_param = Parameter.create(name='pen_param',title='Pen parameters', type='pen',expanded = False)
+        show_plot = Parameter.create(name= 'show_plot', title = 'Show',type= 'bool', value= True,expanded = False)
+        show_plot.sigValueChanged.connect(self.valueChanging)
+        pen_param.sigValueChanging.connect(self.valueChanging)     
+        # name = opts.get('name', None)   
+        # self.setName(opts.get('name', None))
+        # self.setTitle(opts.get('title', None))
+        self.addChildren([show_plot,pen_param])
+        # p = Parameter.create(name='Axis', type='group', children=[show_plot,pen_param], removable=False, renamable=False)
+
+    def valueChanging(self,param, value):
+        self.valueChanging_signal.emit(param, value)   
 
 class FileParameter(pTypes.GroupParameter):
     valueChanging_signal = Signal(object,object)
@@ -494,3 +512,76 @@ class FileParameter(pTypes.GroupParameter):
 
     def valueChanging(self,param, value):
         self.valueChanging_signal.emit(param, value)
+
+
+    # def addROI_linearRegionItem(self,edges,orientation):
+    #     # Create ROI item
+    #     lr = CustomLinearRegionItem(self.makeInitialShape(edges),orientation=orientation)        
+    #     lr.leftDoubleClicked.connect(self.gotLeftDoubleClicked)
+    #     lr.singleMiddleClicked.connect(self.gotMiddleSingleClicked)
+    #     lr.setZValue(10)
+    #     return lr
+
+    # def addROI_infiniteLineItem(self,pos,angle,label):
+    #     # self.view_1D.viewRange()[1]
+    #     # pos = np.sum(self.view_1D.viewRange()[0])/2
+    #     il = pg.InfiniteLine(pos = pos,movable=True, angle=angle, label=label+'={value:0.2f}', 
+    #                    labelOpts={'position':0.1, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': True})
+    #     il.setZValue(10)
+    #     return il
+ROI_NAME_PREFIX = 'ROI_'
+ROI2D_TYPES = ['RectROI', 'EllipseROI']
+
+class ROIScalableGroup(GroupParameter):
+    def __init__(self, roi_type='1D', **opts):
+        opts['type'] = 'group'
+        opts['addText'] = "Add"
+        self.roi_type = roi_type
+        if roi_type != '1D':
+            opts['addList'] = ROI2D_TYPES
+        super().__init__(**opts)
+
+    def addNew(self, typ=''):
+        name_prefix = ROI_NAME_PREFIX
+        child_indexes = [int(par.name()[len(name_prefix) + 1:]) for par in self.children()]
+        if not child_indexes:
+            newindex = 0
+        else:
+            newindex = max(child_indexes) + 1
+
+        child = {'name': f'{ROI_NAME_PREFIX}{newindex:02d}', 'type': 'group', 'removable': True, 'renamable': False}
+
+        children = [{'name': 'type', 'type': 'str', 'value': self.roi_type, 'readonly': True, 'visible': False}, ]
+        if self.roi_type == '2D':
+            children.extend([{'title': 'ROI Type', 'name': 'roi_type', 'type': 'str', 'value': typ, 'readonly': True},
+                             {'title': 'Use channel', 'name': 'use_channel', 'type': 'list',
+                              'limits': ['red', 'green', 'blue', 'spread']}, ])
+        else:
+            children.append({'title': 'Use channel', 'name': 'use_channel', 'type': 'list'})
+
+        functions = ['Sum', 'Mean', 'half-life', 'expotime']
+        children.append({'title': 'Math type:', 'name': 'math_function', 'type': 'list', 'limits': functions,
+                         'value': 'Sum', 'visible': self.roi_type == '1D'})
+        # children.extend([
+        #     {'name': 'Color', 'type': 'color', 'value': list(np.roll(self.color_list, newindex)[0])}, ])
+        if self.roi_type == '2D':
+            children.extend([{'name': 'position', 'type': 'group', 'children': [
+                {'name': 'x', 'type': 'float', 'value': 0, 'step': 1},
+                {'name': 'y', 'type': 'float', 'value': 0, 'step': 1}
+            ]}, ])
+        else:
+            children.extend([{'name': 'position', 'type': 'group', 'children': [
+                {'name': 'left', 'type': 'float', 'value': 0, 'step': 1},
+                {'name': 'right', 'type': 'float', 'value': 10, 'step': 1}
+            ]}, ])
+        if self.roi_type == '2D':
+            children.extend([
+                {'name': 'size', 'type': 'group', 'children': [
+                    {'name': 'width', 'type': 'float', 'value': 10, 'step': 1},
+                    {'name': 'height', 'type': 'float', 'value': 10, 'step': 1}
+                ]},
+                {'name': 'angle', 'type': 'float', 'value': 0, 'step': 1}])
+
+        child['children'] = children
+
+        self.addChild(child)

@@ -258,38 +258,11 @@ class Ui_VMI_toolbox_panel(object):
         self.groupBox.setObjectName(u"groupBox")
         self.gridLayout_3 = QGridLayout(self.groupBox)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.abel_inversion_sel_label = QLabel(self.groupBox)
-        self.abel_inversion_sel_label.setObjectName(u"abel_inversion_sel_label")
-
-        self.gridLayout_3.addWidget(self.abel_inversion_sel_label, 0, 0, 1, 1)
-
-        self.abelInversion_comboBox = QComboBox(self.groupBox)
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.addItem("")
-        self.abelInversion_comboBox.setObjectName(u"abelInversion_comboBox")
+        self.abelLegendre_spinBox = QSpinBox(self.groupBox)
+        self.abelLegendre_spinBox.setObjectName(u"abelLegendre_spinBox")
         sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.abelInversion_comboBox.sizePolicy().hasHeightForWidth())
-        self.abelInversion_comboBox.setSizePolicy(sizePolicy2)
-        self.abelInversion_comboBox.setInputMethodHints(Qt.ImhNone)
-        self.abelInversion_comboBox.setMaxCount(10)
-        self.abelInversion_comboBox.setSizeAdjustPolicy(QComboBox.AdjustToContentsOnFirstShow)
-
-        self.gridLayout_3.addWidget(self.abelInversion_comboBox, 0, 1, 1, 2)
-
-        self.abel_inversion_sel_label_2 = QLabel(self.groupBox)
-        self.abel_inversion_sel_label_2.setObjectName(u"abel_inversion_sel_label_2")
-
-        self.gridLayout_3.addWidget(self.abel_inversion_sel_label_2, 1, 0, 1, 2)
-
-        self.abelLegendre_spinBox = QSpinBox(self.groupBox)
-        self.abelLegendre_spinBox.setObjectName(u"abelLegendre_spinBox")
         sizePolicy2.setHeightForWidth(self.abelLegendre_spinBox.sizePolicy().hasHeightForWidth())
         self.abelLegendre_spinBox.setSizePolicy(sizePolicy2)
         self.abelLegendre_spinBox.setMaximum(1000000000)
@@ -297,17 +270,6 @@ class Ui_VMI_toolbox_panel(object):
         self.abelLegendre_spinBox.setValue(2)
 
         self.gridLayout_3.addWidget(self.abelLegendre_spinBox, 1, 2, 1, 1)
-
-        self.abel_inversion_sel_label_3 = QLabel(self.groupBox)
-        self.abel_inversion_sel_label_3.setObjectName(u"abel_inversion_sel_label_3")
-
-        self.gridLayout_3.addWidget(self.abel_inversion_sel_label_3, 2, 0, 1, 2)
-
-        self.abelSymmetrize_checkBox = QCheckBox(self.groupBox)
-        self.abelSymmetrize_checkBox.setObjectName(u"abelSymmetrize_checkBox")
-        self.abelSymmetrize_checkBox.setTristate(False)
-
-        self.gridLayout_3.addWidget(self.abelSymmetrize_checkBox, 2, 2, 1, 1)
 
         self.abel_inversion_sel_label_4 = QLabel(self.groupBox)
         self.abel_inversion_sel_label_4.setObjectName(u"abel_inversion_sel_label_4")
@@ -322,8 +284,51 @@ class Ui_VMI_toolbox_panel(object):
 
         self.gridLayout_3.addWidget(self.abelSmooth_doubleSpinBox, 3, 2, 1, 1)
 
+        self.abel_inversion_sel_label = QLabel(self.groupBox)
+        self.abel_inversion_sel_label.setObjectName(u"abel_inversion_sel_label")
+
+        self.gridLayout_3.addWidget(self.abel_inversion_sel_label, 0, 0, 1, 1)
+
+        self.abelInversion_comboBox = QComboBox(self.groupBox)
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.addItem("")
+        self.abelInversion_comboBox.setObjectName(u"abelInversion_comboBox")
+        sizePolicy2.setHeightForWidth(self.abelInversion_comboBox.sizePolicy().hasHeightForWidth())
+        self.abelInversion_comboBox.setSizePolicy(sizePolicy2)
+        self.abelInversion_comboBox.setInputMethodHints(Qt.ImhNone)
+        self.abelInversion_comboBox.setMaxCount(10)
+        self.abelInversion_comboBox.setSizeAdjustPolicy(QComboBox.AdjustToContentsOnFirstShow)
+
+        self.gridLayout_3.addWidget(self.abelInversion_comboBox, 0, 1, 1, 2)
+
+        self.abelSymmetrize_checkBox = QCheckBox(self.groupBox)
+        self.abelSymmetrize_checkBox.setObjectName(u"abelSymmetrize_checkBox")
+        self.abelSymmetrize_checkBox.setTristate(False)
+
+        self.gridLayout_3.addWidget(self.abelSymmetrize_checkBox, 2, 2, 1, 1)
+
+        self.abel_inversion_sel_label_2 = QLabel(self.groupBox)
+        self.abel_inversion_sel_label_2.setObjectName(u"abel_inversion_sel_label_2")
+
+        self.gridLayout_3.addWidget(self.abel_inversion_sel_label_2, 1, 0, 1, 2)
+
+        self.abel_inversion_sel_label_3 = QLabel(self.groupBox)
+        self.abel_inversion_sel_label_3.setObjectName(u"abel_inversion_sel_label_3")
+
+        self.gridLayout_3.addWidget(self.abel_inversion_sel_label_3, 2, 0, 1, 2)
+
 
         self.horizontalLayout_4.addWidget(self.groupBox)
+
+        self.abelInversion_pushButton = QPushButton(self.abel_tab)
+        self.abelInversion_pushButton.setObjectName(u"abelInversion_pushButton")
+
+        self.horizontalLayout_4.addWidget(self.abelInversion_pushButton)
 
         self.output_tabWidget.addTab(self.abel_tab, "")
         self.rabbit_tab = QWidget()
@@ -424,7 +429,7 @@ class Ui_VMI_toolbox_panel(object):
 
         self.retranslateUi(VMI_toolbox_panel)
 
-        self.output_tabWidget.setCurrentIndex(0)
+        self.output_tabWidget.setCurrentIndex(1)
         self.FT_window_comboBox.setCurrentIndex(0)
 
 
@@ -467,6 +472,7 @@ class Ui_VMI_toolbox_panel(object):
         self.radialContour_checkBox.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Angular", None))
         self.output_tabWidget.setTabText(self.output_tabWidget.indexOf(self.basic_tab), QCoreApplication.translate("VMI_toolbox_panel", u"Basic", None))
         self.groupBox.setTitle(QCoreApplication.translate("VMI_toolbox_panel", u"Abel inversion", None))
+        self.abel_inversion_sel_label_4.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Smooth", None))
         self.abel_inversion_sel_label.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Algorithm", None))
         self.abelInversion_comboBox.setItemText(0, QCoreApplication.translate("VMI_toolbox_panel", u"Abel Davis", None))
         self.abelInversion_comboBox.setItemText(1, QCoreApplication.translate("VMI_toolbox_panel", u"Basex", None))
@@ -476,10 +482,10 @@ class Ui_VMI_toolbox_panel(object):
         self.abelInversion_comboBox.setItemText(5, QCoreApplication.translate("VMI_toolbox_panel", u"Linbasex", None))
         self.abelInversion_comboBox.setItemText(6, QCoreApplication.translate("VMI_toolbox_panel", u"Onion peeling", None))
 
+        self.abelSymmetrize_checkBox.setText("")
         self.abel_inversion_sel_label_2.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Legendre polynomial", None))
         self.abel_inversion_sel_label_3.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Symmetrize", None))
-        self.abelSymmetrize_checkBox.setText("")
-        self.abel_inversion_sel_label_4.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Smooth", None))
+        self.abelInversion_pushButton.setText(QCoreApplication.translate("VMI_toolbox_panel", u"Show", None))
         self.output_tabWidget.setTabText(self.output_tabWidget.indexOf(self.abel_tab), QCoreApplication.translate("VMI_toolbox_panel", u"Abel", None))
         self.FT_zeropadding_comboBox.setItemText(0, QCoreApplication.translate("VMI_toolbox_panel", u"Next Power of 2 (from input)", None))
         self.FT_zeropadding_comboBox.setItemText(1, QCoreApplication.translate("VMI_toolbox_panel", u"Power of 2", None))
