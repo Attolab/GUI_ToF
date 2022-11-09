@@ -23,26 +23,73 @@
      <x>0</x>
      <y>0</y>
      <width>491</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="load_action"/>
+    <widget class="QMenu" name="menuSession">
+     <property name="title">
+      <string>Session</string>
+     </property>
+     <widget class="QMenu" name="menuRecent">
+      <property name="title">
+       <string>Recent</string>
+      </property>
+      <addaction name="separator"/>
+     </widget>
+     <addaction name="actionSave"/>
+     <addaction name="actionLoad"/>
+     <addaction name="menuRecent"/>
+     <addaction name="actionClose"/>
+    </widget>
+    <addaction name="actionFile_load"/>
     <addaction name="separator"/>
-    <addaction name="restart_action"/>
-    <addaction name="quit_action"/>
+    <addaction name="menuSession"/>
+    <addaction name="separator"/>
+    <addaction name="actionMain_restart"/>
+    <addaction name="actionMain_close"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="restoreState_action"/>
+    <addaction name="actionMain_restoreState"/>
+   </widget>
+   <widget class="QMenu" name="menuViewer">
+    <property name="title">
+     <string>Viewer</string>
+    </property>
+    <widget class="QMenu" name="menuCreate">
+     <property name="title">
+      <string>Create</string>
+     </property>
+     <addaction name="actionViewer1D_create"/>
+     <addaction name="actionViewer2D_create"/>
+    </widget>
+    <widget class="QMenu" name="menuOpened_Viewer">
+     <property name="title">
+      <string>Opened Viewer</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menuCreate"/>
+    <addaction name="menuOpened_Viewer"/>
+    <addaction name="actionViewer_close"/>
+   </widget>
+   <widget class="QMenu" name="menuWidgets">
+    <property name="title">
+     <string>Panel</string>
+    </property>
+    <addaction name="actionToF"/>
+    <addaction name="actionVMI"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuWidgets"/>
+   <addaction name="menuViewer"/>
    <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -62,12 +109,12 @@
     <string>Restart</string>
    </property>
   </action>
-  <action name="quit_action">
+  <action name="actionMain_close">
    <property name="text">
     <string>Quit</string>
    </property>
   </action>
-  <action name="restart_action">
+  <action name="actionMain_restart">
    <property name="text">
     <string>Restart</string>
    </property>
@@ -77,14 +124,59 @@
     <string>g</string>
    </property>
   </action>
-  <action name="load_action">
+  <action name="actionFile_load">
    <property name="text">
     <string>Load</string>
    </property>
   </action>
-  <action name="restoreState_action">
+  <action name="actionMain_restoreState">
    <property name="text">
     <string>Restore initial state</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </action>
+  <action name="actionData">
+   <property name="text">
+    <string>Data</string>
+   </property>
+  </action>
+  <action name="actionViewer1D_create">
+   <property name="text">
+    <string>1D</string>
+   </property>
+  </action>
+  <action name="actionViewer2D_create">
+   <property name="text">
+    <string>2D</string>
+   </property>
+  </action>
+  <action name="actionViewer_close">
+   <property name="text">
+    <string>Close all</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionToF">
+   <property name="text">
+    <string>ToF</string>
+   </property>
+  </action>
+  <action name="actionVMI">
+   <property name="text">
+    <string>VMI</string>
    </property>
   </action>
  </widget>

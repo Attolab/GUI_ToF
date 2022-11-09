@@ -60,26 +60,16 @@ class CustomParameterTree(ParameterTree):
             item.contextMenuEvent(ev)     
         else:
             print('Got clicked')
-
                 
     def parameterTreeRightClicked(self):
         print('Got clicked')
-    # def checkPlotSelection(self,item):
-    #     return (item.param.name() != 'Plot List') & (item.param.type() == 'group')            
-    # def count_PlotTerm(self):
-    #     count = 0
-    #     iterator = QTreeWidgetItemIterator(self) # pass your treewidget as arg
-    #     while iterator.value():
-    #         # print(type(iterator.value()).__name__)
-    #         if self.checkPlotSelection(iterator.value()):
-    #             count +=1        
-    #         iterator += 1
-    #     return count
+
 
 class PlotGroupParameter(pTypes.GroupParameter):
     valueChanging_signal = Signal(object,object)
     removedItem_signal = Signal(object)
     contextMenu_signal = Signal(object)
+    duplicatePlot_signal = Signal(object)
     def __init__(self, **opts):
         # opts['type'] = 'group'
         pTypes.GroupParameter.__init__(self, **opts)
@@ -99,11 +89,9 @@ class PlotGroupParameter(pTypes.GroupParameter):
         show_plot.sigValueChanged.connect(self.valueChanging)
         pen_param.sigValueChanging.connect(self.valueChanging)
         p = Parameter.create(name=name, type='group', children=[show_plot,pen_param], removable=True, renamable=True,
-            menu={'Data Treatment':[{'Filter':[]},{'Smoothing':[]}]})   
+            menu={'Duplicate':[],'Data Treatment':[{'Filter':[]},{'Smoothing':[]}]})   
         p.sigRemoved.connect(self.removingPlotGroup)
-        p.sigContextMenu.connect(self.contextMenuTriggered)
-        # for child in p.children():
-        #         child.sigValueChanging.connect(self.valueChanging)        
+        p.sigContextMenu.connect(self.contextMenuTriggered)      
         self.addChildren(
             [p,])
         print([[childs.name(),childs.value()] for childs in pen_param.childs])
@@ -111,7 +99,9 @@ class PlotGroupParameter(pTypes.GroupParameter):
 
 
     def contextMenuTriggered(self, parent, action_label):
-        if action_label == 'Filter':            
+        if action_label[0] == 'Duplicate':
+            self.duplicatePlot_signal.emit(parent)
+        elif action_label == 'Filter':            
             print('Filter Data')
             self.contextMenu_signal.emit(action_label)
         elif action_label == 'Smoothing':    
@@ -119,12 +109,10 @@ class PlotGroupParameter(pTypes.GroupParameter):
             self.contextMenu_signal.emit(action_label)
 
 
-
-
-    def activate(self,action):
-        for childs in self.childs:            
-            if isinstance(childs, GroupParameter):
-                childs.setOpts(expanded=action == 'Expand All') 
+    # def activate(self,action):
+    #     for childs in self.childs:            
+    #         if isinstance(childs, GroupParameter):
+    #             childs.setOpts(expanded=action == 'Expand All') 
 
     def makeNextNameEntry(self,baseName='Plot'):
         hasFoundName = False
@@ -379,52 +367,6 @@ class VMIParameter(pTypes.GroupParameter):
                         'limits':[0, 2048],
                         },                                                                                                                                                               
                         }                                                  
-        # display_parameters =  {
-        #             'show_axis': {
-        #                 'title':'Show Axis',                                        
-        #                 'type': 'bool',
-        #                 'value': True,
-        #                 },   
-        #             'show_center': {
-        #                 'title':'Show Center',                                        
-        #                 'type': 'bool',
-        #                 'value': True,
-        #                 },    
-        #             'show_range': {
-        #                 'title':'Show Range',                                        
-        #                 'type': 'bool',
-        #                 'value': True,
-        #                 },                          
-        #         }                      
-
-        # display_parameters =  {
-        #             'Axis': {
-        #                 'title':'Axis',                                        
-        #                 'type': 'group',
-        #                 'children':{
-        #                     'show_axis': {
-        #                     'title':'Show Axis',                                        
-        #                     'type': 'bool',
-        #                     'value': True,
-        #                     },   
-        #                 },   
-        # },
-        #             'show_center': {
-        #                 'title':'Show Center',                                        
-        #                 'type': 'bool',
-        #                 'value': True,
-        #                 },    
-        #             'show_range': {
-        #                 'title':'Show Range',                                        
-        #                 'type': 'bool',
-        #                 'value': True,
-        #                 },             
-        # }
-        # pen_param = Parameter.create(name='pen_param',title='Pen parameters', type='pen',expanded = False)
-        # show_plot = Parameter.create(name= 'show_axis', title = 'Show',type= 'bool', value= True,expanded = False)
-        # show_plot.sigValueChanged.connect(self.valueChanging)
-        # pen_param.sigValueChanging.connect(self.valueChanging)     
-        # p = Parameter.create(name='Axis', type='group', children=[show_plot,pen_param], removable=False, renamable=False)
 
         # params_file = Parameter.create(name='file_parameters',title='File parameters', type='group',expanded = False,children = file_params)
         # params_file = FileParameter(name="file_parameters", title='File parameters', tip='Click to add children',children=[])

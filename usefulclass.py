@@ -82,6 +82,14 @@ class FourierTransform:
         return W     
 
 
+class ClassManipulation:
+    def makeDictfromTuple(tuple,data=[]):
+        # Fast build of dic from a tuple
+        tree_dict = data
+        for key in tuple:
+            tree_dict = {key: tree_dict}        
+        return tree_dict
+
 class Filter:
     # Filter function for starting and ending function
     def ApplyFilter(x,y,start=False,end=False,axis = 0):    

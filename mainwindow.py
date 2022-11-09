@@ -27,6 +27,8 @@ import numpy as np
 import os
 from CustomDataTreeWidget import CustomDataTreeWidget
 from pyqtgraph import DataTreeWidget
+from viewerDockArea import ViewerContainer
+from viewer1D_widget import Viewer1DWidget
 
 #for i in *.ui; do pyside6-uic ${i%.ui}.ui > ${i%.ui}_ui.py; done
 class MainWindow(QMainWindow,Ui_MainWindow):
@@ -40,6 +42,7 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self._data = dict() # Temporary array for containing data
         self._dock = dict()
         self._widgets = dict()
+        self._viewer = dict()
         self.setupWindows()
         self.connectSignal()          
 
@@ -67,7 +70,7 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea,dock)
         self._dock['fileSelection_dock'] = dock
         self._widgets['fileSelection_widget'] = widget        
-        self.openMBES()
+        # self.openMBES()
         self.showMaximized() 
 
         dock = QDockWidget('Data Browser',self)
@@ -76,6 +79,14 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea,dock)
         self._dock['dataBrowser_dock'] = dock
         self._widgets['dataBrowser_widget'] = widget        
+
+
+        dock = QDockWidget('Viewer browser',self)
+        dock.setWidget(ViewerContainer())
+        self.addDockWidget(Qt.LeftDockWidgetArea,dock)
+        self._dock['viewer_dock'] = dock
+        dock.hide()
+
 
 
     def openMBES(self):
@@ -99,19 +110,23 @@ class MainWindow(QMainWindow,Ui_MainWindow):
 
     def connectSignal(self):
         # CONNECT ACTIONS #
-        self.restart_action.triggered.connect(restart)
-        self.restart_action.setShortcut(QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_Q))
-        self.quit_action.triggered.connect(self.close)
-        self.quit_action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_Q))
+        self.actionMain_restart.triggered.connect(restart)
+        self.actionMain_restart.setShortcut(QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_Q))        
+        self.actionMain_close.triggered.connect(self.close)
+        self.actionMain_close.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_Q))
 
-        self.load_action.triggered.connect(self.loadData)
-        self.load_action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_L))
+        self.actionFile_load.triggered.connect(self.loadData)
+        self.actionFile_load.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_L))
 
-        self.restoreState_action.triggered.connect(self.restore)
-        self.restoreState_action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_R))
+        self.actionMain_restoreState.triggered.connect(self.restore)
+        self.actionMain_restoreState.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_R))
 
-        # CONNECT FILE SELECTION PANEL #
+        # CONNECT FILE SELECTION PANEL #        
         self.loadData_signal.connect(self._widgets['fileSelection_widget'].storeFiles)
+
+        self.actionViewer1D_create.triggered.connect(self.openWidget)
+
+        # self.actionViewer2D_create.triggered.connect(lambda i, a='2D':self.openWidget(i,a))
 
         # CONNECT DATA #
         # self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['dataBrowser_widget'].addEntry)
@@ -123,7 +138,28 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         # self._widgets['fileSelection_widget'].sendData_signal.connect(self._widgets['MBES_widget'].showData)
 
         print('Connecting signal')
+    def openWidget(self,):
+        if self._dock['viewer_dock'].isHidden():            
+            self._dock['viewer_dock'].show()
+        self._dock['viewer_dock'].widget().addViewerWidget_signal.emit('1D')
+        # self.showViewerContainer_signal.emit()
+        a = 1
+        # self._dock['viewer_dock'].widget().
 
+        # area = self._dock['viewer_dock']._dockArea
+        # d2 = Dock("Dock2 - Console", size=(500,300), closable=True)
+        # area.addDock(d2)
+        # V = Viewer1DWidget()
+        # d2.sigClosed.connect(self.test)
+        # self._viewer.append(V)
+        # V.closeEvent()
+        # d2.addWidget(V)
+        # if self._dock['viewer_dock'].isHidden():            
+        #     self._dock['viewer_dock'].show()
+            # widget = Viewer1DWidget()
+            # self._dock['viewer_dock'].setWidget(widget)
+    def test(self,p):
+        a = 1
     def quit(self):
         self.close()
 def restart():

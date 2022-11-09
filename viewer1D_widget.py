@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,Q
     QSizePolicy, QWidget, QFileDialog,QMenu)
 import pyqtgraph as pg
 from CustomROI import CustomLinearRegionItem
+from usefulclass import ClassManipulation
 from viewer1D_widget_ui import Ui_Viewer1DWidget
 import numpy as np
 import matplotlib.pyplot as plt
@@ -66,7 +67,7 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
                             {'Collapse':[]}
                         ],
                         'Clear':[],
-                        'New':
+                        'Load':
                         [
                             {'File':
                             [
@@ -76,25 +77,41 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
                             ] }
                         ]
                         }        
-                        
-        contextMenu = {'Expand/Collapse':[{'Expand':[]},{'Collapse':[]}],
-                        'Clear': [],
-                        'New':[{'File':[{'.txt':[]},{'.py':[]},{'.something':[]}] }]}        
+        contextMenu = {'Load':[],
+                        'Clear':[],
+                        }                                 
         contextActions = ['Expand All','Collapse All']
         self.plotGroupParameter = PlotGroupParameter(name="plot_list",title="Plot List", tip='',
                      children=[],context=contextActions,menu= contextMenu)
-        # self.plotGroupParameter.sigContextMenu.connect(self.plotGroupParameter.contextMenuEvent)
+        self.plotGroupParameter.sigChildRemoved.connect(self.removePlotTree)      
+        self.plotGroupParameter.valueChanging_signal.connect(self.updatePlotDataItem)
+        self.plotGroupParameter.duplicatePlot_signal.connect(self.duplicatePlot)
+        self.plotGroupParameter.sigContextMenu.connect(self.contextMenuEventParameter)
         self.plot_ParameterTree.setParameters(self.plotGroupParameter)
         self.plot_ParameterTree.itemSelected_signal.connect(self.updatePlotSelection)
         self.plot_ParameterTree.plot_list = self.plot_list
 
+        contextMenu = {'Save settings':[],
+                        'Copy settings':[],
+                        'Load settings':[],
+                        }   
         self.viewerGroupParameter = Viewer1DGroupParameter(name="viewer_options",title="Viewer settings", tip='',
                      children=[],context=contextActions,menu= contextMenu,expanded = False)
         self.viewerGroupParameter.valueChanging_signal.connect(self.updatePlotWidget)
 
         self.settings_ParameterTree.setParameters(self.viewerGroupParameter)
+    def contextMenuEventParameter(self,object,path):
+        dic = ClassManipulation.makeDictfromTuple(path)
+        if path[0] == 'Clear':
+            object.clearChildren()
+        elif path[0] == 'Load':
+            print('Opening dialog box')
 
 
+
+
+
+        a = 1
     def test(self,group_parameter,contextMenu):
         if (contextMenu =='Expand All') | (contextMenu =='Collapse All'):
             self.plotGroupParameter.activate(contextMenu)
@@ -114,6 +131,21 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
     #     if pg.PlotCurveItem in items:
     #         print(0)
 
+    def getDataFromPlot(self,plot,):
+        return plot.xData,plot.yData
+
+
+    def duplicatePlot(self,plotParameter):
+        name = plotParameter.name()+'_copy'
+        for plotDataItem,plotParameterGroup in self.plot_list:
+            if plotParameter == plotParameterGroup:
+        # for index in range(len(self.plot_list)):
+            # if self.plotGroupParameter.childs[index] == plotParameter:  
+            # plotElements = self.plot_list[index]
+            # if plotParameter in plotElements:
+                x,y = self.getDataFromPlot(plotDataItem) 
+                self.addPlot(name=name,x=x,y=y)
+
     def addPlot(self,name = None, x = np.arange(1000),y = None):
         if y is None:
             y = np.random.normal(0,100)+np.random.normal(size=(1000,))
@@ -125,9 +157,10 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.plot.addItem(plot_dataItem)
 
         index = len(self.plot_list)
-        self.plotGroupParameter.addNew(parameters=plot_dataItem.opts['pen'],name = name)        
-        self.plotGroupParameter.removedItem_signal.connect(self.removePlotTree)
-        self.plotGroupParameter.valueChanging_signal.connect(self.updatePlotDataItem)
+        self.plotGroupParameter.addNew(parameters=plot_dataItem.opts['pen'],name = name)  
+        # self.plotGroupParameter.sigChildRemoved.connect(self.removePlotTree)      
+        # self.plotGroupParameter.valueChanging_signal.connect(self.updatePlotDataItem)
+        # self.plotGroupParameter.duplicatePlot_signal.connect(self.duplicatePlot)
         self.plot_list.append([plot_dataItem,self.plotGroupParameter.childs[index]])
 
     def updatePlotDataItem(self,plotParameter,item):
@@ -250,10 +283,14 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
     def removePlot(self,item):
         self.plot.removeItem(item[0]) 
         self.plot_list.remove(item)
-    def removePlotTree(self,child):
+    def removePlotTree(self,obj,child):
         removedItems = [plotItem for plotItem in self.plot_list if child == plotItem[1]]
         [self.removePlot(item) for item in removedItems]
         
+    def clearPlot(self):
+        a = 1
+        # a = requestRemove
+        [self.removePlot(item) for item in self.plot_list]
 
     def updatePlotSelection(self,row,status):    
         if len(self.plot_list) > row:

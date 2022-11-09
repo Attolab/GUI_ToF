@@ -97,8 +97,8 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         self.showRange = self.viewerGroupParameter.child('display_parameters').child('center').child('show_plot').value()
         self.updateWidgets()
         if self.path:
-            self.data = self.getData()          
-            self.updateImagePlot(self.transformData(self.data))
+            self._data = self.getData()          
+            self.updateImagePlot(self.data('transformed'))
     def updateGUI(self,param,values):
         for value in values:
             path = param.childPath(value[0])
@@ -165,7 +165,7 @@ class VMIPanel(Ui_VMI_panel,QWidget):
 
     def computeAbel(self,):
         parameters = self.VMI_toolBox.getParameters()        
-        abel_obj = Abel_object(self.transformData(self.data), self.centerY, self.centerX, 0.1, 1, parameters['abelLegendre_spinBox'], parameters['Rmax_doubleSpinBox'])    
+        abel_obj = Abel_object(self.data('transformed'), self.centerY, self.centerX, 0.1, 1, parameters['abelLegendre_spinBox'], parameters['Rmax_doubleSpinBox'])    
         abel_obj.precalculate()
         abel_obj.invert()
         abel_obj.reconstruct()
@@ -235,9 +235,15 @@ class VMIPanel(Ui_VMI_panel,QWidget):
     def getData(self,index = 0):
         if self.path:
             data = self.loadData(index)
-            return data            
+        else:
+            print('You first need to load a dataset')
+        return data            
             
-
+    def data(self,dtype ='raw'):
+        if dtype =='raw':
+            return self._data
+        elif dtype =='transformed':
+            return self.transformData(self._data)
     def loadData(self,index):
         return np.squeeze(self.fileManager.readVMIData_h5(index))  
     
@@ -258,9 +264,9 @@ class VMIPanel(Ui_VMI_panel,QWidget):
         return data
 
     def loadImagefromIndex(self,index):  
-        self.data = self.getData(index) 
-        self.updateImagePlot(self.transformData(self.data))
-
+        self._data = self.getData(index) 
+        self.updateImagePlot(self.data('transformed'))
+        
     def loadFilefromButton(self):
         if hasattr(self,'path_folder'):
             self.path = str(QFileDialog.getOpenFileName(self, 'Import image',self.path_folder)[0])    
