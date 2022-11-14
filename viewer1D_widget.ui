@@ -20,23 +20,46 @@
    <string>Form</string>
   </property>
   <property name="locale">
-   <locale language="C" country="AnyTerritory"/>
+   <locale language="C" country="AnyCountry"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="GraphicsLayoutWidget" name="viewer_GraphicsLayoutWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <property name="rightMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="GraphicsLayoutWidget" name="viewer_GraphicsLayoutWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="options_checkBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>options</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>

@@ -75,6 +75,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
 
     def connectSignals(self):
         self.show2D_checkBox.stateChanged.connect(self.updateGUI)
+        self.options_checkBox.stateChanged.connect(self.updateGUI)
         self.showHist_checkBox.stateChanged.connect(self.updateGUI)        
         self.showROI_checkBox.pressed.connect(self.updateGUI)
         # Table connection
@@ -92,6 +93,7 @@ class Viewer2DWidget(Ui_Viewer2DWidget,QWidget):
         self.showHideWidget([self.plot_2D],self.show2D_checkBox.isChecked())
         self.showHideWidget([self.histLUT_2D],self.showHist_checkBox.isChecked())
         self.showHideWidget(self.ROI,not(self.showROI_checkBox.isChecked()))
+        self.showHideWidget([self.groupBox],self.options_checkBox.isChecked())
 
 
     def setupToolButton(self):        

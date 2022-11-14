@@ -35,6 +35,9 @@
       <string>Session</string>
      </property>
      <widget class="QMenu" name="menuRecent">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="title">
        <string>Recent</string>
       </property>
@@ -71,6 +74,9 @@
      <addaction name="actionViewer2D_create"/>
     </widget>
     <widget class="QMenu" name="menuOpened_Viewer">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Opened Viewer</string>
      </property>

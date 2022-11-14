@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'viewer2D_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.4
+## Created by: Qt User Interface Compiler version 6.2.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QHBoxLayout,
-    QHeaderView, QLabel, QSizePolicy, QTableWidgetItem,
-    QToolButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QGroupBox,
+    QHBoxLayout, QHeaderView, QLabel, QSizePolicy,
+    QTableWidgetItem, QToolButton, QVBoxLayout, QWidget)
 
 from CustomTableWidget import ROITableWidget
 from pyqtgraph import GraphicsLayoutWidget
@@ -32,9 +32,9 @@ class Ui_Viewer2DWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Viewer2DWidget.sizePolicy().hasHeightForWidth())
         Viewer2DWidget.setSizePolicy(sizePolicy)
-        Viewer2DWidget.setLocale(QLocale(QLocale.C, QLocale.AnyTerritory))
-        self.horizontalLayout_4 = QHBoxLayout(Viewer2DWidget)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        Viewer2DWidget.setLocale(QLocale(QLocale.C, QLocale.AnyCountry))
+        self.horizontalLayout_3 = QHBoxLayout(Viewer2DWidget)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout = QHBoxLayout()
@@ -98,23 +98,34 @@ class Ui_Viewer2DWidget(object):
 
         self.horizontalLayout_2.addWidget(self.autoLevels_checkBox)
 
+        self.options_checkBox = QCheckBox(Viewer2DWidget)
+        self.options_checkBox.setObjectName(u"options_checkBox")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.options_checkBox.sizePolicy().hasHeightForWidth())
+        self.options_checkBox.setSizePolicy(sizePolicy2)
+        self.options_checkBox.setLayoutDirection(Qt.RightToLeft)
+
+        self.horizontalLayout_2.addWidget(self.options_checkBox)
+
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
 
-        self.horizontalLayout_4.addLayout(self.verticalLayout_2)
+        self.horizontalLayout_3.addLayout(self.verticalLayout_2)
 
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.verticalLayout = QVBoxLayout()
+        self.groupBox = QGroupBox(Viewer2DWidget)
+        self.groupBox.setObjectName(u"groupBox")
+        self.verticalLayout = QVBoxLayout(self.groupBox)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.makeROI_toolButton = QToolButton(Viewer2DWidget)
+        self.makeROI_toolButton = QToolButton(self.groupBox)
         self.makeROI_toolButton.setObjectName(u"makeROI_toolButton")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.makeROI_toolButton.sizePolicy().hasHeightForWidth())
-        self.makeROI_toolButton.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.makeROI_toolButton.sizePolicy().hasHeightForWidth())
+        self.makeROI_toolButton.setSizePolicy(sizePolicy3)
         self.makeROI_toolButton.setMinimumSize(QSize(150, 0))
         self.makeROI_toolButton.setPopupMode(QToolButton.MenuButtonPopup)
         self.makeROI_toolButton.setToolButtonStyle(Qt.ToolButtonTextOnly)
@@ -123,7 +134,7 @@ class Ui_Viewer2DWidget(object):
 
         self.verticalLayout.addWidget(self.makeROI_toolButton)
 
-        self.tableROI_tableWidget = ROITableWidget(Viewer2DWidget)
+        self.tableROI_tableWidget = ROITableWidget(self.groupBox)
         if (self.tableROI_tableWidget.columnCount() < 2):
             self.tableROI_tableWidget.setColumnCount(2)
         __qtablewidgetitem = QTableWidgetItem()
@@ -131,11 +142,11 @@ class Ui_Viewer2DWidget(object):
         __qtablewidgetitem1 = QTableWidgetItem()
         self.tableROI_tableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         self.tableROI_tableWidget.setObjectName(u"tableROI_tableWidget")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.tableROI_tableWidget.sizePolicy().hasHeightForWidth())
-        self.tableROI_tableWidget.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.tableROI_tableWidget.sizePolicy().hasHeightForWidth())
+        self.tableROI_tableWidget.setSizePolicy(sizePolicy4)
         self.tableROI_tableWidget.setMinimumSize(QSize(100, 0))
         self.tableROI_tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableROI_tableWidget.horizontalHeader().setStretchLastSection(True)
@@ -143,10 +154,7 @@ class Ui_Viewer2DWidget(object):
         self.verticalLayout.addWidget(self.tableROI_tableWidget)
 
 
-        self.horizontalLayout_3.addLayout(self.verticalLayout)
-
-
-        self.horizontalLayout_4.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_3.addWidget(self.groupBox)
 
 
         self.retranslateUi(Viewer2DWidget)
@@ -163,6 +171,8 @@ class Ui_Viewer2DWidget(object):
         self.label_2.setText(QCoreApplication.translate("Viewer2DWidget", u"Color", None))
         self.autoRange_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"AutoRange", None))
         self.autoLevels_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"AutoLevels", None))
+        self.options_checkBox.setText(QCoreApplication.translate("Viewer2DWidget", u"options", None))
+        self.groupBox.setTitle(QCoreApplication.translate("Viewer2DWidget", u"Options", None))
         self.makeROI_toolButton.setText(QCoreApplication.translate("Viewer2DWidget", u"Add ROI", None))
         ___qtablewidgetitem = self.tableROI_tableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("Viewer2DWidget", u"Name", None));

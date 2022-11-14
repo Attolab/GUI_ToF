@@ -27,8 +27,9 @@ import numpy as np
 import os
 from CustomDataTreeWidget import CustomDataTreeWidget
 from pyqtgraph import DataTreeWidget
-from viewerDockArea import ViewerContainer
+from viewerContainer_widget import ViewerContainer
 from viewer1D_widget import Viewer1DWidget
+import pyqtgraph.console
 
 #for i in *.ui; do pyside6-uic ${i%.ui}.ui > ${i%.ui}_ui.py; done
 class MainWindow(QMainWindow,Ui_MainWindow):
@@ -87,7 +88,14 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self._dock['viewer_dock'] = dock
         dock.hide()
 
+        # dock = QDockWidget('Console',self)
+        # dock.setWidget(pyqtgraph.console.ConsoleWidget(self))
+        # self.addDockWidget(Qt.LeftDockWidgetArea,dock)
+        # self._dock['viewer_dock'] = dock
+        # dock.hide()
 
+        # import pyqtgraph
+        # pyqtgraph.console.ConsoleWidget()
 
     def openMBES(self):
         dock = QDockWidget('MBES Panel',self,floating=False)

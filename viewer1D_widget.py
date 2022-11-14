@@ -55,11 +55,24 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.proxy = pg.SignalProxy(self.view_1D.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)     
         self.connectSignals()
         self.addPlot_pushButton.clicked.connect(self.addPlot)
+        self.updateGUI()
         if parent:
             self.setParent(parent)
     def connectSignals(self):     
         self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
         self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)        
+        self.options_checkBox.stateChanged.connect(self.updateGUI)
+        
+    def showHideWidget(self,items,show_bool = True):
+        if show_bool:        
+            [item.show() for item in items]
+        else:
+            [item.hide() for item in items]
+
+    def updateGUI(self):
+        self.showHideWidget([self.tabWidget],self.options_checkBox.isChecked())
+        # self.adjustSize()
+
     def setupTreeParameterWidget(self):
         contextMenu = {'Expand/Collapse':
                         [
