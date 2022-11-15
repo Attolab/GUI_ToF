@@ -13,11 +13,11 @@ import numpy as np
 from CustomQMenu import DataSelectionQMenu
 from editableTreeModel import TreeModel,NoEditDelegate
 from dataContainer import DataContainer
+from dataViewer import DataViewer
 import copy
 class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
-    showVariable_signal = Signal(object)
+    showVariable_signal = Signal(object,object)
     operation_signal = Signal(object)
-    showVariable_signal = Signal(object)
     removeSelectedRows_signal = Signal(object)
     def __init__(self,parent = None, data = None):
         super(CustomDataTreeWidget, self).__init__(parent)         
@@ -26,6 +26,7 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.setupWindows()
 
         self.DC = DataContainer() # Class containing data stored as dic, share similar adress structure with nodes structure of treeModel         
+        self.DW = DataViewer() # QTabwidget that contains a tableview to display/edit data
         # Initializing tree view and model
         headers = ["Name", "Type", "Descriptions"]         
         self.model = TreeModel(headers, [])
@@ -42,7 +43,8 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.removeSelectedRows_signal.connect(self.model.removeNodesEntry)
         self.model.nodeKeyChanged_signal.connect(self.DC.updateEntry)
         self.model.nodeKeyRemoved_signal.connect(self.DC.removeEntry)
-
+        # self.model.sendAdress_signal.connect(self.DC.showData)
+        self.showVariable_signal.connect(self.DW.makeTab)
     def makeBinding(self):
         self.shortcut = []
         self.shortcut.append(QShortcut(QKeySequence(Qt.CTRL + Qt.Key_V),self.treeView).activated.connect(self.pasteSelectedItems))
@@ -79,7 +81,8 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
     def addEntry_pushButton(self):
         data = {'Type':{"Project A": np.ones((5,1)),
                 "Project B": np.zeros((5,5)),
-                "Project C": np.ones((1,5))}}   
+                "Project C": np.ones((1,5)),
+                "Project D": np.ones((2,5,5))}}   
         data = {'test':data}
         self.addData(data)
 
@@ -90,9 +93,18 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
         self.treeView.resizeColumnToContents(0)        
         
     def doubleClicked_treeWidget_function(self,index):
-        self.showVariable_signal.emit(index)
-        print(self.model.getItem(index).data(0))
+        if self.DW.isHidden():
+            self.DW.show()
+        # #Find items
+        item = self.model.getItem(index,)
+        # for child in item.childItems:
+        if not(item.childItems):
+            key = self.model.getAdress(self.model.getItem(index,))    
+            data = self.DC.data(key)
+            self.showVariable_signal.emit(key,data)
 
+            print(data)
+        print(self.model.getItem(index).data(0))        
  ################################################## Read Context menu ##########################################    
     def readQMenuSignal(self,input):
         print(input)
@@ -185,6 +197,25 @@ class CustomDataTreeWidget(Ui_CustomDataTreeWidget,QWidget):
     def clearAll(self):
         self.model.clear()
         self.DC.clearData()
+
+from PySide6 import QtCore
+class DAV_TableModel(QtCore.QAbstractTableModel):
+
+    def __init__(self, data):
+        super(DAV_TableModel, self).__init__()
+        self._data = data
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            # Note: self._data[index.row()][index.column()] will also work
+            value = self._data[index.row(), index.column()]
+            return str(value)
+
+    def rowCount(self, index):
+        return self._data.shape[0]
+
+    def columnCount(self, index):
+        return self._data.shape[1]
 
 def main():
     import numpy as np

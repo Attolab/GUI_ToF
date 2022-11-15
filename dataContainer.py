@@ -54,8 +54,7 @@ class DataContainer():
         for key in reversed(key_tuple):
             if i < key_pos:            
                 i+=1
-                tree_dict = {key: tree_dict}        
-                
+                tree_dict = {key: tree_dict}                        
         return tree_dict
         
 
@@ -73,7 +72,7 @@ def main():
     print(D._data)
     D.setData(data)
     print(D._data)
-    D.makeDicFromKey( ('Type', 'Project A'))
+    D.makeDicFromKey( ('Type', 'Project A'),0)
     A = 1
 if __name__=="__main__":
     main()
