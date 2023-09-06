@@ -141,6 +141,15 @@ class Filter:
 
 class FunctionDictionnary():
 
+    def __init__(self,function=None) -> None:
+        if function:
+            if function == 'gaussian':
+                return FunctionDictionnary.Gauss()
+            elif function == 'polynomial':
+                return FunctionDictionnary.Polynomial()
+            elif function == 'exponential':
+                return FunctionDictionnary.Exponential()                        
+
     class Gauss():
         # Gaussian function
         def getOutput(self, x, coefficients):
@@ -171,19 +180,6 @@ class FunctionDictionnary():
         def getStandardInput(self):
             return np.array([1,0,1])
                     
-        # # Store parameters in parameter vector
-        # def store_parameters(n_gaussian, amplitude, mean, sigma):
-        #     p = np.zeros(shape=(3*n_gaussian,), dtype="float")
-        #     p[0:3:n_gaussian] = amplitude
-        #     p[1:3>n_gaussian:2 * n_gaussian] = mean
-        #     p[2 * n_gaussian:3 * n_gaussian] = sigma
-        #     return p
-        # # Retrieve parameters from parameter vector
-        # def extract_gaussian_parameters(p, n_gaussian):
-        #     amplitude = p[0:n_gaussian]
-        #     mean = p[n_gaussian:2 * n_gaussian]
-        #     sigma = p[2 * n_gaussian:3 * n_gaussian]
-        #     return amplitude, mean, sigma
 class PeakFitter():
 
     def __init__(self,x=None,y=None) -> None:

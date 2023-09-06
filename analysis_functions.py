@@ -46,8 +46,9 @@ class AnalysisFunctions():
 
     def goFromTimeToEnergy(axisTime, signalTime, alpha, beta, t0, doFlip=True):
         axisEnergy = AnalysisFunctions.ToF2eV(axisTime,alpha,beta,t0)
-        signalEnergy = signalTime*AnalysisFunctions.ToF2eV_Jac(axisTime,alpha,t0)[:,np.newaxis]
-        if doFlip:
+        signalEnergy = signalTime/AnalysisFunctions.ToF2eV_Jac(axisTime,alpha,t0)[:,np.newaxis]
+        signalEnergy = signalTime
+        if doFlip:            
             axisEnergy = np.flip(axisEnergy)
             signalEnergy = np.flip(signalEnergy,axis=0) 
         return axisEnergy,signalEnergy  

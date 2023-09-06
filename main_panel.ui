@@ -102,11 +102,22 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QPushButton" name="loadSpectrum_pushButton">
-             <property name="text">
-              <string>Load Spectrum</string>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QPushButton" name="loadSpectrum_pushButton">
+               <property name="text">
+                <string>Load Spectrum</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="exportData_pushButton">
+               <property name="text">
+                <string>Export Signal</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -166,7 +177,7 @@
           <x>0</x>
           <y>0</y>
           <width>582</width>
-          <height>278</height>
+          <height>247</height>
          </rect>
         </property>
         <attribute name="label">
@@ -594,6 +605,11 @@
           </spacer>
          </item>
         </layout>
+       </widget>
+       <widget class="QWidget" name="page">
+        <attribute name="label">
+         <string>Export data</string>
+        </attribute>
        </widget>
       </widget>
      </item>

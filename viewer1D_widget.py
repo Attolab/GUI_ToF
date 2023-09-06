@@ -62,6 +62,7 @@ class Viewer1DWidget(Ui_Viewer1DWidget,QWidget):
         self.makeROI_toolButton.toolButtonClicked_signal.connect(self.addROI)
         self.tableROI_tableWidget.removeItem_signal.connect(self.removeROITableItem)        
         self.options_checkBox.stateChanged.connect(self.updateGUI)
+        self.tableROI_tableWidget.QMenu_signal.connect(self.sendQMenuCommand)
         
     def showHideWidget(self,items,show_bool = True):
         if show_bool:        

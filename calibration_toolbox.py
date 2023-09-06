@@ -163,9 +163,9 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
 
     def findPeaks_scipyPeakFinder(self):
         #Simple use of the scipy find_peaks method
-        prominence_factor = self.parameter_list["inputAxis0Mult_lineEdit_2"]
-        distance = self.parameter_list["inputAxis0Mult_lineEdit"]
-        rel_height = self.parameter_list["inputAxis0Mult_lineEdit_3"]
+        prominence_factor = float(self.parameter_list["inputAxis0Mult_lineEdit_2"])
+        distance = float(self.parameter_list["inputAxis0Mult_lineEdit"])
+        rel_height = float(self.parameter_list["inputAxis0Mult_lineEdit_3"])
 
         peaks_index,properties = sgn.find_peaks(x=np.abs(self.y), prominence = prominence_factor*np.max(self.y), distance = distance, rel_height=rel_height)
 
@@ -193,11 +193,13 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         FM(fileName).writeCalibration(self.coeffCalib_tableWidget.selectedItems())
 
     def loadCalibration_menuFunction(self):
-        self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_calib)[0]         
+        self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_calib)[0]        
+        self.path_calib = QFileInfo(fileName).path() 
         [self.loadFile(filename) for filename in self.path_filenames]   
 
     def loadFile(self,fileName):
         coeffs = FM(fileName).readCalibration()
+        self.path_calib = QFileInfo(fileName).path()
         self.addEntry(self.coeffCalib_tableWidget,coeffs)
 
     def importSignal_menuFunction(self):
@@ -207,7 +209,27 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         print('Action 2 activated.')
         self.signal_requestInput.emit('FT')
     def importCustomSignal_menuFunction(self):
-        self.signal_requestInput.emit("custom")
+        import csv
+        #open folder to choose file according to type
+        if hasattr(self,'path_folder'):
+            self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]
+        else:
+            self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file')[0]
+
+
+        self.path = self.path_filenames[0]
+        # if self.path[-3:]=="npy":
+        #     output = [tof,np.load(self.path)]
+        # elif self.path[-3:]=="csv":
+        with open(self.path) as file_name:
+            file_read = csv.reader(file_name)
+            array = list(file_read)
+            array = array[1:]
+            x = [float(array[i][0]) for i in range(len(array))]
+            y = [float(array[i][1]) for i in range(len(array))]
+            output = [np.array(x),np.array(y)] 
+        self.getData(output)
+        # self.signal_requestInput.emit("custom")
         print('Action 3 activated.')    
 
     
@@ -290,7 +312,7 @@ class CalibrationToolBox(Ui_CalibrationToolbox,QWidget):
         #Truncation of the plot (jacobian and limitation to low energies)
         mask = jac >=0
         self.x_fit = self.x_fit[mask]
-        self.y_fit = self.y[mask] * jac[mask]
+        self.y_fit = self.y[mask] / jac[mask]
         mask = self.x_fit < 150
         self.x_fit = self.x_fit[mask]
         self.y_fit = self.y_fit[mask]

@@ -6,7 +6,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform,QCloseEvent)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QPushButton,QListWidgetItem,
     QSizePolicy, QWidget, QFileDialog,QMenu)
-
+import os
 from main_panel_ui import Ui_main_panel
 from previewPlot_panel import PreviewPlot_Panel
 from file_manager import FileManager as FM
@@ -67,6 +67,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.energyMin_lineEdit.editingFinished.connect(self.updateEnergyAxis)
         self.energySteps_lineEdit.editingFinished.connect(self.updateEnergyAxis)        
         self.showPhase_pushButton.pressed.connect(self.plotRabbitPhase)
+        self.exportData_pushButton.pressed.connect(self.exportData)
     def connectSignals_widgets(self):
         self.calibration_toolbox.signal_requestInput.connect(self.plotPreview_panel.getData)
         self.calibration_toolbox.signal_applyCalibration.connect(self.updateCalibration)
@@ -95,7 +96,7 @@ class MainPanel(Ui_main_panel,QWidget):
         self.hasCalibration = True
         self.updateGUI()
 
-
+    
     def updateBaseFolder(self):
         self.path_folder = self.folderBase_lineEdit.text()
 
@@ -144,7 +145,7 @@ class MainPanel(Ui_main_panel,QWidget):
         return currentRow
 
     def getData_energySpace(self,axis1,signal):    
-        signal-=np.mean(signal[0])
+        # signal-=np.mean(signal[0])
         axis1,signal = Filter.ApplyFilter(axis1,signal,start = self.calibration[2]) # Remove unphysical counts
         axis1,signal = af.goFromTimeToEnergy(axis1,signal,self.calibration[0],self.calibration[1],self.calibration[2]) # Convert from time to energy
         axis1,signal = Filter.ApplyFilter(axis1,signal,start = float(self.energyMin_lineEdit.text()), end = float(self.energyMax_lineEdit.text())) # Select energy subset
@@ -162,29 +163,57 @@ class MainPanel(Ui_main_panel,QWidget):
         else:
             return 'signal_transient'
 
-    def loadData(self,filename):
-        signal = FM(filename,'MBES').readFile()     
-        self.isDataLoaded = True  
-        self.showData(signal)
+    def exportData(self,):
+        if self.isDataLoaded:
+            filename_in = self.fileSelection_listWidget.item(self.returnCurrentRow()).text()
+            filename = os.path.splitext(self.fileSelection_listWidget.item(self.returnCurrentRow()).text())[0]
+            fileName = QFileDialog.getSaveFileName(self,'Export Data',filename+'_export.h5')[0]                
+            signal,measure_axis,param_axis = self.loadData(filename_in,doDisplay=False)
+            if bool(filename):
+                data = dict()
+                data['Parameters'] = dict(bin_axis=measure_axis,position=param_axis)
+                data['Data'] = signal
+                
+                FM().storeDic(fileName,data)
 
-    def showData(self,data):         
+        a = 0
+    def loadData(self,filename,doDisplay=True):
+        try:
+            self.signal = FM(filename,'MBES').readFile()     
+        except:
+            pass
+        try:
+            self.signal = FM(filename,'TDC').readFile()     
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+        self.isDataLoaded = True          
+        signal,measure_axis,param_axis = self.preTreatData(self.signal)
+        if doDisplay:
+            self.showData(signal,measure_axis,param_axis)
+        return signal,measure_axis,param_axis
+    def preTreatData(self,data):
         if len(data) == 1:
             data = data[0]           
         signal = data['signal']
-        t_vol = data['t_vol']
-        delay = data['delay']
-        signal = signal[self.getDataType()] 
-        if self.normalizeSpectrum_checkbox.isChecked():
-            signal = signal/np.sum(data['signal']['signal_statOff'],axis=0)
+        measure_axis = data['t_vol']
+        param_axis = data['delay']   
+        for i,sig in enumerate(signal):
+            if self.normalizeSpectrum_checkbox.isChecked():             
+                signal[i] = sig/np.sum(data['signal']['signal_statOff'],axis=0)     
+        if not self.time_radioButton.isChecked():
+            for key in signal.keys():
+                KE,signal[key] = self.getData_energySpace(measure_axis,signal[key])  
+            measure_axis = KE
+        if len(param_axis) < 2: # hack when there is only one point
+            param_axis = np.append(param_axis,-param_axis)
+            signal = np.append(signal,signal,axis = 1) 
             
-        if len(delay) < 2: # hack when there is only one point
-            delay = np.append(delay,-delay)
-            signal = np.append(signal,signal,axis = 1)        
-        if self.time_radioButton.isChecked():
-            self.plotPreview_panel.setData(axis_0=delay,axis_1=t_vol, data=signal)    
-        else:
-            KE,data = self.getData_energySpace(t_vol,signal)
-            self.plotPreview_panel.setData(axis_0=delay,axis_1=KE, data=data)   
+        return signal,measure_axis,param_axis
+
+    def showData(self,data,measure_axis,param_axis):  
+        data = data[self.getDataType()] 
+       
+        self.plotPreview_panel.setData(axis_0=param_axis,axis_1=measure_axis, data=data)   
 
     ################################################## List widget functions ##########################################    
 
@@ -233,14 +262,15 @@ class MainPanel(Ui_main_panel,QWidget):
             print('No item available, check input')
 
     def press_loadButton_function(self):    
-        self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]            
-        self.path = self.path_filenames[0]            
-
+        self.path_filenames = QFileDialog.getOpenFileNames(self, 'Choose file',self.path_folder)[0]      
+        path = self.path_filenames[0]                  
+        self.path_folder = os.path.dirname(path)
         try:
-            self.loadData(self.path)
+            self.loadData(path)
             [self.addFileToList(filename= path) for path in self.path_filenames if path]
             self.fileSelection_listWidget.setCurrentRow(self.fileSelection_listWidget.count())      
-        except:
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
             print('Error loading file')
 
     def addFileToList(self,filename):

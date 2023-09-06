@@ -84,10 +84,20 @@ class Ui_main_panel(object):
 
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.verticalLayout_5 = QVBoxLayout()
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.loadSpectrum_pushButton = QPushButton(self.page_5)
         self.loadSpectrum_pushButton.setObjectName(u"loadSpectrum_pushButton")
 
-        self.horizontalLayout_5.addWidget(self.loadSpectrum_pushButton)
+        self.verticalLayout_5.addWidget(self.loadSpectrum_pushButton)
+
+        self.exportData_pushButton = QPushButton(self.page_5)
+        self.exportData_pushButton.setObjectName(u"exportData_pushButton")
+
+        self.verticalLayout_5.addWidget(self.exportData_pushButton)
+
+
+        self.horizontalLayout_5.addLayout(self.verticalLayout_5)
 
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -125,7 +135,7 @@ class Ui_main_panel(object):
         self.toolBox.addItem(self.page_5, u"File selection")
         self.page_6 = QWidget()
         self.page_6.setObjectName(u"page_6")
-        self.page_6.setGeometry(QRect(0, 0, 582, 278))
+        self.page_6.setGeometry(QRect(0, 0, 582, 247))
         self.verticalLayout = QVBoxLayout(self.page_6)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_2 = QHBoxLayout()
@@ -348,6 +358,9 @@ class Ui_main_panel(object):
         self.verticalLayout_3.addItem(self.verticalSpacer_4)
 
         self.toolBox.addItem(self.page_7, u"RABBIT")
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.toolBox.addItem(self.page, u"Export data")
 
         self.v_optionLayout.addWidget(self.toolBox)
 
@@ -389,6 +402,7 @@ class Ui_main_panel(object):
         self.fileSelection_listWidget.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>List of selected files:</p><p>- double click on a file to load it</p><p>- right click to remove selected files or clear list</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.loadSpectrum_pushButton.setText(QCoreApplication.translate("main_panel", u"Load Spectrum", None))
+        self.exportData_pushButton.setText(QCoreApplication.translate("main_panel", u"Export Signal", None))
         self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
         self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
         self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
@@ -453,5 +467,6 @@ class Ui_main_panel(object):
         self.oscillationFrequency_lineEdit.setText(QCoreApplication.translate("main_panel", u"4.7", None))
         self.customUnwrapPhase_checkBox.setText(QCoreApplication.translate("main_panel", u"CustomUnwrapped", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_7), QCoreApplication.translate("main_panel", u"RABBIT", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("main_panel", u"Export data", None))
     # retranslateUi
 

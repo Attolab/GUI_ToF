@@ -26,23 +26,25 @@ class FileManager:
         self.filename = filename
         self.format = format
         self.dataset_list= []
-        if not self.format:
-            filename,self.format = os.path.splitext(self.filename)
-        try:
-            self.makeKeyList()
-        except:
-            return
+        # if not self.format:
+        #     filename,self.format = os.path.splitext(self.filename)
+        # try:
+        #     self.makeKeyList()
+        # except:
+        #     return
             
-    def makeKeyList(self):
-        with h5py.File(self.filename, 'r') as file:
-            # keys = self.get_dataset_keys(file)
-            # keys = self.convertInput(keys)
-            # self.parameter_key = get_key_parameters(keys)
-            self.position_key = ['StagePosition/Position_um']
-            self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
+    # def makeKeyList(self):
+    #     with h5py.File(self.filename, 'r') as file:
+    #         # keys = self.get_dataset_keys(file)
+    #         # keys = self.convertInput(keys)
+    #         # self.parameter_key = get_key_parameters(keys)
+    #         self.position_key = ['StagePosition/Position_um']
+    #         self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
     def readFile(self):
         if self.format == 'MBES':
             return self.Read_h5()
+        elif self.format == 'TDC':
+            return self.Read_TDC_h5()        
         elif self.format == 'VMI':
             return self.ReadCamera_h5()
 
@@ -95,7 +97,17 @@ class FileManager:
         keys = []        
         f.visit(lambda key: keys.append(key) if isinstance(f[key], h5py.Dataset) else None)
         return keys
-
+    def get_values_TDC(self, f, keys):
+        L = len(keys)
+        for i,key in enumerate(keys):
+            _data = npa(f[key])
+            if len(_data.shape)>1: 
+                _data = _data[-1]
+            if i == 0:
+                data = np.zeros((L,len(_data)))
+            data[i]=_data
+        return data
+ 
     def get_values(self, f, keys):
         # return [npa(np.squeeze(f[key])) if len(f[key].shape) > 1 else npa(f[key]) for key in keys]        
         return npaa([np.squeeze(npa(f[key])) for key in keys])
@@ -153,7 +165,92 @@ class FileManager:
         with h5py.File(self.filename, 'r') as file:
             data = self.get_values(file,[self.data_key[index]])            
         return data.T
+    
+    # def loadFileHist_h5(filename,):
+    #     with h5py.File(filename, 'r') as file:
+    #         stage_position = np.array(file[stage_pattern]) # Loqd stage position
+    #         bin,size = (np.array(file[p]) for p in parameters_pattern) # Loqd bin+hist size
+    #         data_hist = np.zeros((len(stage_position),size)) 
+    #         # Extract keys from coinc
+    #         keys = get_dataset_keys(file)
+    #         keys = np.array(convertInput(keys))
+    #         # Loop through positions
+    #         for i,pos in enumerate(stage_position):
+    #             data_hist[i] = np.array(file[f'{data_pattern}{int(pos)}']) # Load mean hist
+    #     return data_hist    
+    def Read_TDC_h5(self):        
+        with h5py.File(self.filename, 'r') as file:
+            data_hist = np.array(file['Data']['data'])
+            stage_position = np.array(file['Parameters']['position'])
+            t_vol = np.array(file['Parameters']['bin_axis'])*1e9
+            if data_hist.shape[0] != 3:
+                data_transient = data_hist.T
+                data_statOff = data_transient
+                data_statOn = data_transient
+            else:
+                data_transient = data_hist[0].T
+                data_statOn = data_hist[1].T
+                data_statOff = data_hist[-1].T
+        delay = stage_position * 0.6328 / ( 2 * np.pi * 0.299792458)
+        # delay = delay[:len(data_hist)]
+        # delay,indexing = np.unique(delay,return_index=True)
+        # data_statOn = data_statOn[:,indexing]
+        # data_statOff = data_statOff[:,indexing]
+        # data_hist = data_hist[:,indexing]   
+        signal_params = {'signal':{
+                    'signal_transient':data_transient ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
+                    },
+                    't_vol':t_vol,
+                    'delay':delay
+                    }                                        
+        return signal_params
+    
+    def storeDic(self,filename,data):
+        with h5py.File(filename, "w") as hf:
+            for grp_name in data:
+                grp = hf.create_group(grp_name)
+                for dset_name in data[grp_name]:
+                    dset = grp.create_dataset(dset_name, data = data[grp_name][dset_name])
+                    print(grp_name, dset_name, data[grp_name][dset_name])
+        
 
+    def Read_TDC_h5_old(self):
+        parameters_pattern = [f"Scan_parameters/bin",f"Scan_parameters/size",f"Scan_parameters/numberOfMeasurements",f"Scan_parameters/exposureTime"]
+        stage_pattern = f"StagePosition/Scan"
+        data_pattern = f"Data/On/Scan"
+        index = 0
+        with h5py.File(self.filename, 'r') as file:
+            keys = self.get_dataset_keys(file)
+            key_pos = f'{stage_pattern}{index}phase'
+            bin,N_bins,N_measurements,exp_time = (np.array(file[p]) for p in parameters_pattern)
+            stage_position = np.array(file[key_pos]) # Load stage position
+            data_hist = np.zeros((len(stage_position),N_bins)) 
+
+            for i,pos in enumerate(stage_position):
+                key_data = f'{data_pattern}{index}Averaged_on{i}'
+                data_hist[i] = np.array(file[key_data]) # Load mean hist
+            data_hist = data_hist.T
+            data_statOn = np.zeros_like(data_hist)
+            data_statOff = np.zeros_like(data_hist)
+
+        t_vol = bin*27.4*1e-3*np.arange(N_bins)
+        delay = stage_position * 0.6328 / ( 2 * np.pi * 0.299792458)
+        delay = delay[:len(data_hist)]
+        delay,indexing = np.unique(delay,return_index=True)
+        # delay = 2 * position / ( 0.299792458)
+        # indexing = np.argsort(delay)
+        # delay = delay[indexing]
+        data_statOn = data_statOn[:,indexing]
+        data_statOff = data_statOff[:,indexing]
+        data_hist = data_hist[:,indexing]   
+        signal_params = {'signal':{
+                    'signal_transient':data_hist ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
+                    },
+                    't_vol':t_vol,
+                    'delay':delay
+                    }                                        
+        return signal_params
+    
     def Read_h5(self):
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
