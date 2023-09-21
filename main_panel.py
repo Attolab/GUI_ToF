@@ -54,6 +54,8 @@ class MainPanel(Ui_main_panel,QWidget):
         self.loadSpectrum_pushButton.pressed.connect(self.press_loadButton_function)
         self.makeCalibration_pushButton.pressed.connect(self.press_makeCalibrationButton_function)
         self.loadCalibration_pushButton.pressed.connect(self.press_loadCalibrationButton_function)
+        self.unitsSelection_comboBox.currentIndexChanged.connect(self.loadCurrentItem)
+        self.doFourier_checkbox.stateChanged.connect(self.loadCurrentItem)
         self.energy_radioButton.toggled.connect(self.loadCurrentItem)
         self.time_radioButton.toggled.connect(self.loadCurrentItem)
         self.transient_radioButton.toggled.connect(self.loadCurrentItem)
@@ -177,13 +179,13 @@ class MainPanel(Ui_main_panel,QWidget):
                 FM().storeDic(fileName,data)
 
         a = 0
-    def loadData(self,filename,doDisplay=True):
+    def loadData(self,filename,doDisplay=True):        
         try:
-            self.signal = FM(filename,'MBES').readFile()     
+            self.signal = FM(filename,'MBES').readFile(units=self.unitsSelection_comboBox.currentText())     
         except:
             pass
         try:
-            self.signal = FM(filename,'TDC').readFile()     
+            self.signal = FM(filename,'TDC').readFile(units=self.unitsSelection_comboBox.currentText())     
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
         self.isDataLoaded = True          
@@ -213,7 +215,7 @@ class MainPanel(Ui_main_panel,QWidget):
     def showData(self,data,measure_axis,param_axis):  
         data = data[self.getDataType()] 
        
-        self.plotPreview_panel.setData(axis_0=param_axis,axis_1=measure_axis, data=data)   
+        self.plotPreview_panel.setData(axis_0=param_axis,axis_1=measure_axis, data=data,doFourier=self.doFourier_checkbox.isChecked())   
 
     ################################################## List widget functions ##########################################    
 

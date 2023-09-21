@@ -37,7 +37,8 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.displayPlotWidget()     
         self.path_folder = ""   
 
-    def setData(self,data,axis_0,axis_1):
+    def setData(self,data,axis_0,axis_1,doFourier=True):
+        self.doFourier = doFourier
         self.signal_input = np.array(data)
         # Store input        
         if len(axis_0)!=0:
@@ -253,10 +254,11 @@ class PreviewPlot_Panel(Ui_previewPlot_Panel,QWidget):
         self.signal_inputPlot -= self.removeBackground()
         self.updateInterpolation()
         self.parameter_list_signal_toolbox['FT_zeropadding_spinBox'] = self.updateZeroPadding()
-        [self.axis0_outputPlot,self.signal_outputPlot] = self.doFourierTransform(self.axis0_inputPlot,self.signal_inputPlot,
-                                                            N = int(self.parameter_list_signal_toolbox['FT_zeropadding_spinBox']),
-                                                            windowchoice=self.parameter_list_signal_toolbox['FT_window_comboBox'])                                                          
-        self.updateOutputAxis0()                                                                 
+        if self.doFourier:
+            [self.axis0_outputPlot,self.signal_outputPlot] = self.doFourierTransform(self.axis0_inputPlot,self.signal_inputPlot,
+                                                                N = int(self.parameter_list_signal_toolbox['FT_zeropadding_spinBox']),
+                                                                windowchoice=self.parameter_list_signal_toolbox['FT_window_comboBox'])                                                          
+            self.updateOutputAxis0()                                                                 
 
     def doFourierTransform(self,x,y,N=None,windowchoice = 0) -> np.array:    
         return FourierTransform.do_Fourier(x,y*FourierTransform.do_Window(len(x),windowchoice),N) #Windowed Signal,N = npad) #Fourier transform of Signal  
@@ -299,10 +301,12 @@ def main():
 
     t = np.linspace(-150,1000,10000) #Time axis
     amplitude = 1
-    FWHM = 5
+    FWHM = 35
     t0 = 0
     omega = 2*np.pi*374.74057*1e-3 #Frequency
     delta_T = np.linspace(380,420,41)
+    delta_T = np.linspace(0,1000,5000)
+
     S = laserPulse(t,amplitude,t0,FWHM,omega) + laserPulse(t,amplitude,t0+delta_T,FWHM,omega) #Total Signal
     signal_panel = PreviewPlot_Panel(axis_0 = t,signal = S)
     signal_panel.show()

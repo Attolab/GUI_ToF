@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
+    <width>853</width>
     <height>767</height>
    </rect>
   </property>
@@ -38,7 +38,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>582</width>
+          <width>833</width>
           <height>380</height>
          </rect>
         </property>
@@ -120,11 +120,44 @@
             </layout>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Units</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QComboBox" name="unitsSelection_comboBox">
+                <item>
+                 <property name="text">
+                  <string>rad</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>fs</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>micrometer</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>else</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <widget class="QRadioButton" name="transient_radioButton">
+              <widget class="QCheckBox" name="doFourier_checkbox">
                <property name="text">
-                <string>Transient</string>
+                <string>doFourier</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -132,26 +165,49 @@
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="dressingOn_radioButton">
+              <widget class="QCheckBox" name="normalizeSpectrum_checkbox">
                <property name="text">
-                <string>Dressing On</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="dressingOff_radioButton">
-               <property name="text">
-                <string>Dressing off</string>
+                <string>Normalize spectrum</string>
                </property>
               </widget>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QCheckBox" name="normalizeSpectrum_checkbox">
-             <property name="text">
-              <string>Normalize spectrum</string>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string>Scan selection</string>
              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QRadioButton" name="transient_radioButton">
+                  <property name="text">
+                   <string>Transient</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="dressingOn_radioButton">
+                  <property name="text">
+                   <string>Dressing On</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="dressingOff_radioButton">
+                  <property name="text">
+                   <string>Dressing off</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -176,7 +232,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>582</width>
+          <width>833</width>
           <height>247</height>
          </rect>
         </property>
@@ -499,7 +555,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>582</width>
+          <width>833</width>
           <height>360</height>
          </rect>
         </property>

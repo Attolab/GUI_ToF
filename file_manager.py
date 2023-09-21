@@ -40,11 +40,11 @@ class FileManager:
     #         # self.parameter_key = get_key_parameters(keys)
     #         self.position_key = ['StagePosition/Position_um']
     #         self.data_key = [f"Data/Y_axis/Averaged_data_{index}" for index in np.arange(len(self.get_values(file,self.position_key)[0]))]
-    def readFile(self):
+    def readFile(self,units):
         if self.format == 'MBES':
-            return self.Read_h5()
+            return self.Read_h5(units=units)
         elif self.format == 'TDC':
-            return self.Read_TDC_h5()        
+            return self.Read_TDC_h5(units=units)        
         elif self.format == 'VMI':
             return self.ReadCamera_h5()
 
@@ -178,7 +178,18 @@ class FileManager:
     #         for i,pos in enumerate(stage_position):
     #             data_hist[i] = np.array(file[f'{data_pattern}{int(pos)}']) # Load mean hist
     #     return data_hist    
-    def Read_TDC_h5(self):        
+    
+    def convertParameterAxis(self,parameterAxis,units='rad'):
+        if units == 'rad':
+            return parameterAxis * 0.6328 / ( 2 * np.pi * 0.299792458)
+        elif units == 'fs':
+            return parameterAxis
+        elif units == 'micrometer':
+            return parameterAxis * 2 / ( 0.299792458)
+        else:
+            return parameterAxis
+
+    def Read_TDC_h5(self,units='rad'):        
         with h5py.File(self.filename, 'r') as file:
             data_hist = np.array(file['Data']['data'])
             stage_position = np.array(file['Parameters']['position'])
@@ -191,7 +202,8 @@ class FileManager:
                 data_transient = data_hist[0].T
                 data_statOn = data_hist[1].T
                 data_statOff = data_hist[-1].T
-        delay = stage_position * 0.6328 / ( 2 * np.pi * 0.299792458)
+        delay = self.convertParameterAxis(stage_position,units)
+        # delay = stage_position * 0.6328 / ( 2 * np.pi * 0.299792458)
         # delay = delay[:len(data_hist)]
         # delay,indexing = np.unique(delay,return_index=True)
         # data_statOn = data_statOn[:,indexing]
@@ -251,7 +263,7 @@ class FileManager:
                     }                                        
         return signal_params
     
-    def Read_h5(self):
+    def Read_h5(self,units='rad'):
         with h5py.File(self.filename, 'r') as file:
             keys = self.get_dataset_keys(file)
             keys = self.convertInput(keys)
@@ -263,48 +275,22 @@ class FileManager:
                 data_statOff = self.get_values(file,get_key_data(keys,"Static spectra/Averaged_off")).T
             except:
                 data_statOn = np.zeros_like(data_transient)
-                data_statOff = np.zeros_like(data_transient)
-            data = npaa([data_transient,data_statOn,data_statOff])
+                data_statOff = np.zeros_like(data_transient)        
         
-
-        delay = position * 0.633 / ( 2 * np.pi * 0.299792458)
-        # delay = 2 * position / ( 0.299792458)
-        t_vol = parameters[-2] * 1e9 * np.arange(data[0].shape[0])
+        delay = self.convertParameterAxis(position,units)
+        t_vol = parameters[-2] * 1e9 * np.arange(data_transient.shape[0])
         indexing = np.argsort(delay)
         delay = delay[indexing]
         data_statOn = data_statOn[:,indexing]
         data_statOff = data_statOff[:,indexing]
         data_transient = data_transient[:,indexing]   
 
-        # signal_params = {
-        #             'signal_transient':{
-        #             'title': 'Transient',
-        #             'value': data_transient,
-        #             'readonly':True,
-        #             },   
-        #             'signal_statOn':{
-        #             'title': 'pulseOn',                        
-        #             'value': data_statOn,
-        #             'readonly':True,
-        #             },
-        #             'signal_statOff':{
-        #             'title': 'pulseOff',                        
-        #             'value': data_statOff,
-        #             'readonly':True,
-        #             }                                        
-        # }     
         signal_params = {'signal':{
                     'signal_transient':data_transient ,'signal_statOn': data_statOn,'signal_statOff': data_statOff,
                     },
                     't_vol':t_vol,
                     'delay':delay
                     }                                        
-        # P_sig = Parameter.create(name='signal',title='Signal',type='group',children=signal_params)
-        # P_vol = Parameter.create(name='t_vol',title='Flight time',value=parameters[-2] * 1e9 * np.arange(data[0].shape[0]))
-        # P_delay = Parameter.create(name='delay',title='Delay',value=position * 0.633 / ( 2 * np.pi * 0.299792458))
-        # P = Parameter.create(name='Data',type='group',children = [P_sig,P_vol,P_delay])
-        # return self.convert_h5(data,position,parameters)
-        # return self.convert_h5(data,position,parameters)
         return signal_params
 
     def convert_h5(self,data,position,parameters):
