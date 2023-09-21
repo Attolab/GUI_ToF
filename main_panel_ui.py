@@ -16,16 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
-    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPushButton, QRadioButton,
-    QSizePolicy, QSpacerItem, QToolBox, QToolButton,
-    QVBoxLayout, QWidget)
+    QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QPushButton,
+    QRadioButton, QSizePolicy, QSpacerItem, QToolBox,
+    QToolButton, QVBoxLayout, QWidget)
 
 class Ui_main_panel(object):
     def setupUi(self, main_panel):
         if not main_panel.objectName():
             main_panel.setObjectName(u"main_panel")
-        main_panel.resize(602, 767)
+        main_panel.resize(853, 767)
         sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -44,7 +44,7 @@ class Ui_main_panel(object):
         self.toolBox.setSizePolicy(sizePolicy1)
         self.page_5 = QWidget()
         self.page_5.setObjectName(u"page_5")
-        self.page_5.setGeometry(QRect(0, 0, 582, 380))
+        self.page_5.setGeometry(QRect(0, 0, 833, 380))
         self.verticalLayout_2 = QVBoxLayout(self.page_5)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout_3 = QHBoxLayout()
@@ -99,31 +99,65 @@ class Ui_main_panel(object):
 
         self.horizontalLayout_5.addLayout(self.verticalLayout_5)
 
+        self.groupBox = QGroupBox(self.page_5)
+        self.groupBox.setObjectName(u"groupBox")
+        self.horizontalLayout_4 = QHBoxLayout(self.groupBox)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.unitsSelection_comboBox = QComboBox(self.groupBox)
+        self.unitsSelection_comboBox.addItem("")
+        self.unitsSelection_comboBox.addItem("")
+        self.unitsSelection_comboBox.addItem("")
+        self.unitsSelection_comboBox.addItem("")
+        self.unitsSelection_comboBox.setObjectName(u"unitsSelection_comboBox")
+
+        self.horizontalLayout_4.addWidget(self.unitsSelection_comboBox)
+
+
+        self.horizontalLayout_5.addWidget(self.groupBox)
+
+        self.verticalLayout_6 = QVBoxLayout()
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.doFourier_checkbox = QCheckBox(self.page_5)
+        self.doFourier_checkbox.setObjectName(u"doFourier_checkbox")
+        self.doFourier_checkbox.setChecked(True)
+
+        self.verticalLayout_6.addWidget(self.doFourier_checkbox)
+
+        self.normalizeSpectrum_checkbox = QCheckBox(self.page_5)
+        self.normalizeSpectrum_checkbox.setObjectName(u"normalizeSpectrum_checkbox")
+
+        self.verticalLayout_6.addWidget(self.normalizeSpectrum_checkbox)
+
+
+        self.horizontalLayout_5.addLayout(self.verticalLayout_6)
+
+        self.groupBox_2 = QGroupBox(self.page_5)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.horizontalLayout_6 = QHBoxLayout(self.groupBox_2)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.transient_radioButton = QRadioButton(self.page_5)
+        self.transient_radioButton = QRadioButton(self.groupBox_2)
         self.transient_radioButton.setObjectName(u"transient_radioButton")
         self.transient_radioButton.setChecked(True)
 
         self.verticalLayout_4.addWidget(self.transient_radioButton)
 
-        self.dressingOn_radioButton = QRadioButton(self.page_5)
+        self.dressingOn_radioButton = QRadioButton(self.groupBox_2)
         self.dressingOn_radioButton.setObjectName(u"dressingOn_radioButton")
 
         self.verticalLayout_4.addWidget(self.dressingOn_radioButton)
 
-        self.dressingOff_radioButton = QRadioButton(self.page_5)
+        self.dressingOff_radioButton = QRadioButton(self.groupBox_2)
         self.dressingOff_radioButton.setObjectName(u"dressingOff_radioButton")
 
         self.verticalLayout_4.addWidget(self.dressingOff_radioButton)
 
 
-        self.horizontalLayout_5.addLayout(self.verticalLayout_4)
+        self.horizontalLayout_6.addLayout(self.verticalLayout_4)
 
-        self.normalizeSpectrum_checkbox = QCheckBox(self.page_5)
-        self.normalizeSpectrum_checkbox.setObjectName(u"normalizeSpectrum_checkbox")
 
-        self.horizontalLayout_5.addWidget(self.normalizeSpectrum_checkbox)
+        self.horizontalLayout_5.addWidget(self.groupBox_2)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
@@ -135,7 +169,7 @@ class Ui_main_panel(object):
         self.toolBox.addItem(self.page_5, u"File selection")
         self.page_6 = QWidget()
         self.page_6.setObjectName(u"page_6")
-        self.page_6.setGeometry(QRect(0, 0, 582, 247))
+        self.page_6.setGeometry(QRect(0, 0, 833, 247))
         self.verticalLayout = QVBoxLayout(self.page_6)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_2 = QHBoxLayout()
@@ -305,7 +339,7 @@ class Ui_main_panel(object):
         self.toolBox.addItem(self.page_6, u"Calibration")
         self.page_7 = QWidget()
         self.page_7.setObjectName(u"page_7")
-        self.page_7.setGeometry(QRect(0, 0, 582, 360))
+        self.page_7.setGeometry(QRect(0, 0, 833, 360))
         sizePolicy1.setHeightForWidth(self.page_7.sizePolicy().hasHeightForWidth())
         self.page_7.setSizePolicy(sizePolicy1)
         self.verticalLayout_3 = QVBoxLayout(self.page_7)
@@ -403,10 +437,18 @@ class Ui_main_panel(object):
 #endif // QT_CONFIG(tooltip)
         self.loadSpectrum_pushButton.setText(QCoreApplication.translate("main_panel", u"Load Spectrum", None))
         self.exportData_pushButton.setText(QCoreApplication.translate("main_panel", u"Export Signal", None))
+        self.groupBox.setTitle(QCoreApplication.translate("main_panel", u"Units", None))
+        self.unitsSelection_comboBox.setItemText(0, QCoreApplication.translate("main_panel", u"rad", None))
+        self.unitsSelection_comboBox.setItemText(1, QCoreApplication.translate("main_panel", u"fs", None))
+        self.unitsSelection_comboBox.setItemText(2, QCoreApplication.translate("main_panel", u"micrometer", None))
+        self.unitsSelection_comboBox.setItemText(3, QCoreApplication.translate("main_panel", u"else", None))
+
+        self.doFourier_checkbox.setText(QCoreApplication.translate("main_panel", u"doFourier", None))
+        self.normalizeSpectrum_checkbox.setText(QCoreApplication.translate("main_panel", u"Normalize spectrum", None))
+        self.groupBox_2.setTitle(QCoreApplication.translate("main_panel", u"Scan selection", None))
         self.transient_radioButton.setText(QCoreApplication.translate("main_panel", u"Transient", None))
         self.dressingOn_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing On", None))
         self.dressingOff_radioButton.setText(QCoreApplication.translate("main_panel", u"Dressing off", None))
-        self.normalizeSpectrum_checkbox.setText(QCoreApplication.translate("main_panel", u"Normalize spectrum", None))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_5), QCoreApplication.translate("main_panel", u"File selection", None))
 #if QT_CONFIG(tooltip)
         self.makeCalibration_pushButton.setToolTip(QCoreApplication.translate("main_panel", u"<html><head/><body><p>Create a panel to make a calibration from the current signal/FT or from a custom input</p></body></html>", None))
