@@ -188,7 +188,6 @@ class FileManager:
             return parameterAxis * 2 / ( 0.299792458)
         else:
             return parameterAxis
-
     def Read_TDC_h5(self,units='rad'):        
         with h5py.File(self.filename, 'r') as file:
             data_hist = np.array(file['Data']['data'])
@@ -276,7 +275,13 @@ class FileManager:
             except:
                 data_statOn = np.zeros_like(data_transient)
                 data_statOff = np.zeros_like(data_transient)        
-        
+        # Kill extra entries when programs crashes
+        L_min = np.min([position.shape[0],data_statOn.shape[1],data_statOff.shape[1],data_transient.shape[1]])  
+        position=position[:L_min]
+        data_statOn=data_statOn[:,:L_min]
+        data_statOff=data_statOff[:,:L_min]
+        data_transient=data_transient[:,:L_min]
+
         delay = self.convertParameterAxis(position,units)
         t_vol = parameters[-2] * 1e9 * np.arange(data_transient.shape[0])
         indexing = np.argsort(delay)
