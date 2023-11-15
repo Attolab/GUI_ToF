@@ -20,30 +20,6 @@ def storeDic(filename,data):
     hf.close() 
     
 
-def stackSamePos(signal_param_init,doStackSamePos=False):    
-    signal_params = signal_param_init
-    if doStackSamePos:    
-        S = signal_param_init['signal']['signal_transient'].shape[1]
-        upos = np.unique(signal_param_init['delay'],return_index=False)
-        signal_params = {'signal':{
-            'signal_transient':np.zeros((len(upos),S)) ,'signal_statOn': np.zeros((len(upos),S)),'signal_statOff': np.zeros((len(upos),S)),
-            },
-            't_vol':signal_param_init['t_vol'],
-            'delay':upos
-            }     
-        for i,pos in enumerate(upos):
-            mask = (pos == signal_param_init['delay'])
-            signal_params['signal']['signal_transient'][i] = np.mean(signal_param_init['signal']['signal_transient'][mask],axis=0)
-            signal_params['signal']['signal_statOn'][i] = np.mean(signal_param_init['signal']['signal_statOn'][mask],axis=0)
-            signal_params['signal']['signal_statOff'][i] = np.mean(signal_param_init['signal']['signal_statOff'][mask],axis=0)    
-    else:
-        signal_params = signal_param_init
-    return signal_params
-
-
-
-
-
 
 
 
@@ -51,9 +27,11 @@ import os
 
 # folder_init='Q:\\LIDyL\\Atto\\ATTOLAB\\SE1\\Data_Experiments\\SEI_2023\\20231114\\'
 folder_init = '/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SEI_2023/'
-date = '20231114'
+
+date = '20231115'
 folder_init = f'/home/cs268225/Atto/ATTOLAB/SE1/Data_Experiments/SEI_2023/{date}/'
-dataset = '001'
+folder_init = f'C:\\Data\\2023\\{date}\\'
+dataset = '002'
 filename = f'Dataset_{date}_{dataset}.h5'
 folder_out = folder_init+f'{date}_{dataset}/'
 with h5py.File(folder_init+filename,'r') as f:
@@ -79,7 +57,10 @@ with h5py.File(folder_init+filename,'r') as f:
         key_list = signal.keys()
         for channel in key_list:            
             if 'Data' in channel:
-                signal_temp.append(np.array(signal[channel]))
+                if shutter:
+                    signal_temp.append(np.array(signal[channel]))
+                else:
+                    signal_temp.append(np.array(signal[channel]))
             elif 'Axis' in channel:
                 axis_temp.append(np.array(signal[channel]))
         
@@ -87,10 +68,17 @@ with h5py.File(folder_init+filename,'r') as f:
         for i,sig in enumerate(signal_temp):
             data = dict()
             data['Parameters'] = dict(bin_axis=t_axis,position=parameter_axis[np.argmax(psize)])         
+            data['Parameters'] = dict(bin_axis=t_axis,position=np.arange(0,55)*0.5)         
+            # parameter_axis[np.argmin(psize)]%2
             if shutter:       
-                H = [signal_temp[0][:,1,:] - signal_temp[0][:,0,:],signal_temp[0][:,1,:],signal_temp[0][:,0,:]]
+                sig_on = np.squeeze(sig[:,np.squeeze(np.where(parameter_axis[np.argmin(psize)]%2==1)),:])
+                sig_off = np.squeeze(sig[:,np.squeeze(np.where(parameter_axis[np.argmin(psize)]%2==0)),:])
+                sig_transient = np.squeeze(np.mean(sig_on - sig_off,axis=1))
+                sig_on = np.squeeze(np.mean(sig_on,axis=1))
+                sig_off = np.squeeze(np.mean(sig_off,axis=1))
+                H = [sig_transient, sig_on , sig_off]
             else:
-                H = [signal_temp[0]]                        
+                H = np.squeeze(sig)
             data['Data'] = dict(data=H)
 
 

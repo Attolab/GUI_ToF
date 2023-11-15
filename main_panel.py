@@ -199,7 +199,7 @@ class MainPanel(Ui_main_panel,QWidget):
         signal = data['signal']
         measure_axis = data['t_vol']
         param_axis = data['delay']   
-        for i,sig in enumerate(signal):
+        for i,sig in enumerate(signal.values()):
             if self.normalizeSpectrum_checkbox.isChecked():             
                 signal[i] = sig/np.sum(data['signal']['signal_statOff'],axis=0)     
         if not self.time_radioButton.isChecked():
